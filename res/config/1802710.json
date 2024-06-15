@@ -47,12 +47,25 @@
     ]
   },
   {
-    "name": "Documentation",
+    "name": "Links",
     "entries": [
       {
         "name": "Momentum Mod Wiki",
         "type": "link",
-        "action": "https://wiki.stratasource.org/momentum"
+        "action": "https://wiki.stratasource.org/momentum",
+        "icon_override": "${GAME_ICON}"
+      },
+      {
+        "name": "Momentum Mod Issue Tracker",
+        "type": "link",
+        "action": "https://github.com/momentum-mod/game/issues",
+        "icon_override": "${GAME_ICON}"
+      },
+      {
+        "name": "Strata Source Issue Tracker",
+        "type": "link",
+        "action": "https://github.com/StrataSource/Engine/issues",
+        "icon_override": "${STRATA_ICON}"
       }
     ]
   }

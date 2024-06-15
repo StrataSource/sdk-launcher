@@ -3,5 +3,8 @@
         <file>config/440000.json</file>
         <file>config/601360.json</file>
         <file>config/1802710.json</file>
+
+        <file>icons/strata_dark.png</file>
+        <file>icons/strata_light.png</file>
     </qresource>
 </RCC>

@@ -2,6 +2,7 @@
 
 #include <filesystem>
 
+#include <QApplication>
 #include <QDesktopServices>
 #include <QLabel>
 #include <QMenuBar>
@@ -9,6 +10,7 @@
 #include <QProcess>
 #include <QScrollArea>
 #include <QStyle>
+#include <QStyleHints>
 #include <QToolButton>
 #include <QVBoxLayout>
 
@@ -56,7 +58,7 @@ constexpr int FIXED_WINDOW_WIDTH = 256;
 Window::Window(QWidget* parent)
 		: QMainWindow(parent) {
 	this->setWindowTitle(PROJECT_NAME.data());
-	this->setFixedSize(FIXED_WINDOW_WIDTH, 500);
+	this->setFixedSize(FIXED_WINDOW_WIDTH, 450);
 
 	// Edit menu
 	//auto* editMenu = this->menuBar()->addMenu(tr("Edit"));
@@ -137,6 +139,12 @@ void Window::loadGameConfig(const QString& path, const QString& installDir, unsi
 						button->setIcon(GameFinder::getGameIcon(appId));
 					} else {
 						button->setIcon(this->style()->standardIcon(QStyle::SP_FileLinkIcon));
+					}
+				} else if (entry.iconOverride == "${STRATA_ICON}") {
+					if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
+						button->setIcon(QIcon{":/icons/strata_dark.png"});
+					} else {
+						button->setIcon(QIcon{":/icons/strata_light.png"});
 					}
 				} else {
 					button->setIcon(QIcon{entry.iconOverride});

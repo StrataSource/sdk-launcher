@@ -47,12 +47,25 @@
     ]
   },
   {
-    "name": "Documentation",
+    "name": "Links",
     "entries": [
       {
         "name": "Strata Wiki",
         "type": "link",
-        "action": "https://wiki.stratasource.org"
+        "action": "https://wiki.stratasource.org",
+        "icon_override": "${STRATA_ICON}"
+      },
+      {
+        "name": "Portal: Revolution Issue Tracker",
+        "type": "link",
+        "action": "https://github.com/SecondFaceSoftware/PortalRevolution-Issues/issues",
+        "icon_override": "${GAME_ICON}"
+      },
+      {
+        "name": "Strata Source Issue Tracker",
+        "type": "link",
+        "action": "https://github.com/StrataSource/Engine/issues",
+        "icon_override": "${STRATA_ICON}"
       }
     ]
   }

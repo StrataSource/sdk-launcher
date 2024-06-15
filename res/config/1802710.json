@@ -8,18 +8,16 @@
         {
           "name": "Momentum Mod - Dev Mode",
           "type": "command",
-          "action": "${ROOT}/bin/win64/chaos",
+          "action": "${ROOT}/bin/${PLATFORM}/chaos",
           "arguments": ["-game", "momentum", "-dev", "-console"],
-          "icon_override": "${GAME_ICON}",
-          "os": "windows"
+          "icon_override": "${GAME_ICON}"
         },
         {
           "name": "Momentum Mod - Dev && Tools Mode",
           "type": "command",
-          "action": "${ROOT}/bin/win64/chaos",
+          "action": "${ROOT}/bin/${PLATFORM}/chaos",
           "arguments": ["-game", "momentum", "-dev", "-console", "-tools"],
-          "icon_override": "${GAME_ICON}",
-          "os": "windows"
+          "icon_override": "${GAME_ICON}"
         }
       ]
     },
@@ -30,21 +28,21 @@
           "name": "Hammer Editor",
           "type": "command",
           "action": "${ROOT}/bin/win64/hammer",
-          "arguments": ["-game", "../../momentum"],
+          "arguments": ["-game", "momentum"],
           "os": "windows"
         },
         {
           "name": "Model Viewer",
           "type": "command",
           "action": "${ROOT}/bin/win64/hlmv",
-          "arguments": ["-game", "../../momentum"],
+          "arguments": ["-game", "momentum"],
           "os": "windows"
         },
         {
           "name": "Face Poser",
           "type": "command",
           "action": "${ROOT}/bin/win64/hlfaceposer",
-          "arguments": ["-game", "../../momentum"],
+          "arguments": ["-game", "momentum"],
           "os": "windows"
         }
       ]

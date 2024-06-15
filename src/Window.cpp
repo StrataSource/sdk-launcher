@@ -206,6 +206,13 @@ void Window::loadGameConfig(const QString& path) {
 
 			QString action = entry.action;
 			action.replace("${ROOT}", gameConfig->getRoot());
+#if defined(_WIN32)
+			action.replace("${PLATFORM}", "win64");
+#elif defined(__linux__)
+			action.replace("${PLATFORM}", "linux64");
+#else
+			#warning "Unknown platform! ${PLATFORM} will not be substituted!"
+#endif
 			if (action.endsWith('/') || action.endsWith('\\')) {
 				action = action.sliced(0, action.size() - 1);
 			}
@@ -225,10 +232,8 @@ void Window::loadGameConfig(const QString& path) {
 						button->setIcon(this->style()->standardIcon(QStyle::SP_FileLinkIcon));
 #endif
 					}
-					QObject::connect(button, &QToolButton::clicked, this, [this, action, args=entry.arguments] {
-						auto process = new QProcess(this);
-						process->setWorkingDirectory(std::filesystem::path{action.toLocal8Bit().constData()}.parent_path().string().c_str());
-						process->start(action, args);
+					QObject::connect(button, &QToolButton::clicked, this, [action, args=entry.arguments, cwd=gameConfig->getRoot()] {
+						QProcess::startDetached(action, args, cwd);
 					});
 					break;
 				case GameConfig::ActionType::LINK:

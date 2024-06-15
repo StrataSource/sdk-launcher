@@ -8,18 +8,16 @@
         {
           "name": "Portal 2: CE - Dev Mode",
           "type": "command",
-          "action": "${ROOT}/bin/win64/chaos",
+          "action": "${ROOT}/bin/${PLATFORM}/chaos",
           "arguments": ["-game", "p2ce", "-dev", "-console"],
-          "icon_override": "${GAME_ICON}",
-          "os": "windows"
+          "icon_override": "${GAME_ICON}"
         },
         {
           "name": "Portal 2: CE - Dev && Tools Mode",
           "type": "command",
-          "action": "${ROOT}/bin/win64/chaos",
+          "action": "${ROOT}/bin/${PLATFORM}/chaos",
           "arguments": ["-game", "p2ce", "-dev", "-console", "-tools"],
-          "icon_override": "${GAME_ICON}",
-          "os": "windows"
+          "icon_override": "${GAME_ICON}"
         }
       ]
     },
@@ -30,32 +28,32 @@
           "name": "Hammer Editor",
           "type": "command",
           "action": "${ROOT}/bin/win64/hammer",
-          "arguments": ["-game", "../../p2ce"],
+          "arguments": ["-game", "p2ce"],
           "os": "windows"
         },
         {
           "name": "Model Viewer",
           "type": "command",
           "action": "${ROOT}/bin/win64/hlmv",
-          "arguments": ["-game", "../../p2ce"],
+          "arguments": ["-game", "p2ce"],
           "os": "windows"
         },
         {
           "name": "Face Poser",
           "type": "command",
           "action": "${ROOT}/bin/win64/hlfaceposer",
-          "arguments": ["-game", "../../p2ce"],
+          "arguments": ["-game", "p2ce"],
           "os": "windows"
         },
         {
           "name": "VPKEdit",
           "type": "command",
-          "action": "${ROOT}/bin/win64/vpkedit"
+          "action": "${ROOT}/bin/${PLATFORM}/vpkedit"
         },
         {
           "name": "VTFView",
           "type": "command",
-          "action": "${ROOT}/bin/win64/vtfview"
+          "action": "${ROOT}/bin/${PLATFORM}/vtfview"
         }
       ]
     },

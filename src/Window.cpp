@@ -55,7 +55,7 @@ QIcon getExecutableIcon(const QString& path) {
 
 constexpr int FIXED_WINDOW_WIDTH = 256;
 
-constexpr std::string_view STR_LAST_CONFIG = "str_last_config";
+constexpr std::string_view STR_RECENT_CONFIGS = "str_recent_configs";
 
 } // namespace
 
@@ -86,16 +86,15 @@ Window::Window(QWidget* parent)
 
 	configMenu->addSeparator();
 
-	configMenu->addAction(this->style()->standardIcon(QStyle::SP_FileIcon), tr("New Custom Config"), Qt::CTRL | Qt::Key_N, [this] {
-		// todo: config creator
-	});
-
 	configMenu->addAction(this->style()->standardIcon(QStyle::SP_DirIcon), tr("Open Custom Config"), Qt::CTRL | Qt::Key_O, [this] {
 		auto filename = QFileDialog::getOpenFileName(this, tr("Open Config"));
 		if (!filename.isEmpty()) {
 			this->loadGameConfig(filename);
 		}
 	});
+
+	this->recent = configMenu->addMenu(this->style()->standardIcon(QStyle::SP_FileDialogDetailedView), tr("Open Recent Config"));
+	// Will be regenerated naturally later on
 
 	// Help menu
 	auto* helpMenu = this->menuBar()->addMenu(tr("Help"));
@@ -125,11 +124,12 @@ Window::Window(QWidget* parent)
 
 	new QVBoxLayout(main);
 
-	if (QSettings settings; !settings.contains(STR_LAST_CONFIG)) {
+	if (QSettings settings; !settings.contains(STR_RECENT_CONFIGS)) {
+		settings.setValue(STR_RECENT_CONFIGS, QStringList{});
 		auto appId = GameFinder::getDefaultGameAppId();
 		this->loadGameConfig(QString(":/config/%1.json").arg(appId));
 	} else {
-		this->loadGameConfig(settings.value(STR_LAST_CONFIG).toString());
+		this->loadGameConfig(settings.value(STR_RECENT_CONFIGS).value<QStringList>().first());
 	}
 }
 
@@ -146,7 +146,16 @@ void Window::loadGameConfig(const QString& path) {
 	}
 
 	QSettings settings;
-	settings.setValue(STR_LAST_CONFIG, path);
+	auto recentConfigs = settings.value(STR_RECENT_CONFIGS).value<QStringList>();
+	if (recentConfigs.contains(path)) {
+		recentConfigs.removeAt(recentConfigs.indexOf(path));
+	}
+	recentConfigs.push_front(path);
+	if (recentConfigs.size() > 10) {
+		recentConfigs.pop_back();
+	}
+	settings.setValue(STR_RECENT_CONFIGS, recentConfigs);
+	this->regenerateRecentConfigs();
 
 	if (auto appId = gameConfig->getAppId()) {
 		this->setWindowIcon(GameFinder::getGameIcon(appId));
@@ -247,4 +256,25 @@ void Window::loadGameConfig(const QString& path) {
 	}
 
 	layout->addStretch();
+}
+
+void Window::regenerateRecentConfigs() {
+	this->recent->clear();
+
+	auto paths = QSettings().value(STR_RECENT_CONFIGS).value<QStringList>();
+	if (paths.empty()) {
+		auto* noRecentFilesAction = this->recent->addAction(tr("No recent files."));
+		noRecentFilesAction->setDisabled(true);
+		return;
+	}
+	for (int i = 0; i < paths.size(); i++) {
+		this->recent->addAction(("&%1: \"" + paths[i] + "\"").arg((i + 1) % 10), [this, path=paths[i]] {
+			this->loadGameConfig(path);
+		});
+	}
+	this->recent->addSeparator();
+	this->recent->addAction(tr("Clear"), [this] {
+		QSettings().setValue(STR_RECENT_CONFIGS, QStringList{});
+		this->regenerateRecentConfigs();
+	});
 }

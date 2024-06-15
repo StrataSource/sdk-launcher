@@ -54,6 +54,12 @@
           "name": "VTFView",
           "type": "command",
           "action": "${ROOT}/bin/${PLATFORM}/vtfview"
+        },
+        {
+          "name": "Workshop Uploader",
+          "type": "command",
+          "action": "${ROOT}/bin/${PLATFORM}/workshopgui",
+          "arguments": ["-game", "p2ce"]
         }
       ]
     },

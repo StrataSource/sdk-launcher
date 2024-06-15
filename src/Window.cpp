@@ -1,7 +1,5 @@
 #include "Window.h"
 
-#include <filesystem>
-
 #include <QApplication>
 #include <QDesktopServices>
 #include <QFileDialog>

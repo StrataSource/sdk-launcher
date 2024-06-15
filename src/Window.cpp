@@ -124,8 +124,12 @@ Window::Window(QWidget* parent)
 
 	if (QSettings settings; !settings.contains(STR_RECENT_CONFIGS)) {
 		settings.setValue(STR_RECENT_CONFIGS, QStringList{});
-		auto appId = GameFinder::getDefaultGameAppId();
-		this->loadGameConfig(QString(":/config/%1.json").arg(appId));
+		if (auto defaultConfigPath = QCoreApplication::applicationDirPath() + "/sdk_launcher_default.json"; QFile::exists(defaultConfigPath)) {
+			this->loadGameConfig(defaultConfigPath);
+		} else {
+			auto appId = GameFinder::getDefaultGameAppId();
+			this->loadGameConfig(QString(":/config/%1.json").arg(appId));
+		}
 	} else {
 		this->loadGameConfig(settings.value(STR_RECENT_CONFIGS).value<QStringList>().first());
 	}

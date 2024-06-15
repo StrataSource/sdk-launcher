@@ -39,9 +39,15 @@ public:
 
 	[[nodiscard]] static std::optional<GameConfig> parse(const QString& path);
 
-	[[nodiscard]] const QList<Section>& getSections() const;
+	[[nodiscard]] const QString& getRoot() const { return this->root; }
+
+	[[nodiscard]] unsigned int getAppId() const { return this->appId; }
+
+	[[nodiscard]] const QList<Section>& getSections() const { return this->sections; }
 
 private:
+	QString root;
+	unsigned int appId = 0;
 	QList<Section> sections;
 
 	GameConfig() = default;

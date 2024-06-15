@@ -1,72 +1,76 @@
-[
-  {
-    "name": "Game",
-    "entries": [
-      {
-        "name": "Portal: Revolution - Dev Mode",
-        "type": "command",
-        "action": "${ROOT}/bin/win64/revolution",
-        "arguments": ["-dev", "-console"],
-        "icon_override": "${GAME_ICON}",
-        "os": "windows"
-      },
-      {
-        "name": "Portal: Revolution - Dev && Tools Mode",
-        "type": "command",
-        "action": "${ROOT}/bin/win64/revolution",
-        "arguments": ["-dev", "-console", "-tools"],
-        "icon_override": "${GAME_ICON}",
-        "os": "windows"
-      }
-    ]
-  },
-  {
-    "name": "Tools",
-    "entries": [
-      {
-        "name": "Hammer Editor",
-        "type": "command",
-        "action": "${ROOT}/bin/win64/hammer",
-        "arguments": ["-game", "../../revolution"],
-        "os": "windows"
-      },
-      {
-        "name": "Model Viewer",
-        "type": "command",
-        "action": "${ROOT}/bin/win64/hlmv",
-        "arguments": ["-game", "../../revolution"],
-        "os": "windows"
-      },
-      {
-        "name": "Face Poser",
-        "type": "command",
-        "action": "${ROOT}/bin/win64/hlfaceposer",
-        "arguments": ["-game", "../../revolution"],
-        "os": "windows"
-      }
-    ]
-  },
-  {
-    "name": "Links",
-    "entries": [
-      {
-        "name": "Strata Wiki",
-        "type": "link",
-        "action": "https://wiki.stratasource.org",
-        "icon_override": "${STRATA_ICON}"
-      },
-      {
-        "name": "Portal: Revolution Issue Tracker",
-        "type": "link",
-        "action": "https://github.com/SecondFaceSoftware/PortalRevolution-Issues/issues",
-        "icon_override": "${GAME_ICON}"
-      },
-      {
-        "name": "Strata Source Issue Tracker",
-        "type": "link",
-        "action": "https://github.com/StrataSource/Engine/issues",
-        "icon_override": "${STRATA_ICON}"
-      }
-    ]
-  }
-]
+{
+  "type": "steam",
+  "appid": "601360",
+  "sections": [
+    {
+      "name": "Game",
+      "entries": [
+        {
+          "name": "Portal: Revolution - Dev Mode",
+          "type": "command",
+          "action": "${ROOT}/bin/win64/revolution",
+          "arguments": ["-dev", "-console"],
+          "icon_override": "${GAME_ICON}",
+          "os": "windows"
+        },
+        {
+          "name": "Portal: Revolution - Dev && Tools Mode",
+          "type": "command",
+          "action": "${ROOT}/bin/win64/revolution",
+          "arguments": ["-dev", "-console", "-tools"],
+          "icon_override": "${GAME_ICON}",
+          "os": "windows"
+        }
+      ]
+    },
+    {
+      "name": "Tools",
+      "entries": [
+        {
+          "name": "Hammer Editor",
+          "type": "command",
+          "action": "${ROOT}/bin/win64/hammer",
+          "arguments": ["-game", "../../revolution"],
+          "os": "windows"
+        },
+        {
+          "name": "Model Viewer",
+          "type": "command",
+          "action": "${ROOT}/bin/win64/hlmv",
+          "arguments": ["-game", "../../revolution"],
+          "os": "windows"
+        },
+        {
+          "name": "Face Poser",
+          "type": "command",
+          "action": "${ROOT}/bin/win64/hlfaceposer",
+          "arguments": ["-game", "../../revolution"],
+          "os": "windows"
+        }
+      ]
+    },
+    {
+      "name": "Links",
+      "entries": [
+        {
+          "name": "Strata Wiki",
+          "type": "link",
+          "action": "https://wiki.stratasource.org",
+          "icon_override": "${STRATA_ICON}"
+        },
+        {
+          "name": "Portal: Revolution Issue Tracker",
+          "type": "link",
+          "action": "https://github.com/SecondFaceSoftware/PortalRevolution-Issues/issues",
+          "icon_override": "${GAME_ICON}"
+        },
+        {
+          "name": "Strata Source Issue Tracker",
+          "type": "link",
+          "action": "https://github.com/StrataSource/Engine/issues",
+          "icon_override": "${STRATA_ICON}"
+        }
+      ]
+    }
+  ]
+}

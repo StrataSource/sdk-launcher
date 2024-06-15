@@ -8,7 +8,7 @@ class Window : public QMainWindow {
 public:
 	explicit Window(QWidget* parent = nullptr);
 
-	void loadGameConfig(const QString& path, const QString& installDir, unsigned int appId = 0);
+	void loadGameConfig(const QString& path);
 
 private:
 	QWidget* main;

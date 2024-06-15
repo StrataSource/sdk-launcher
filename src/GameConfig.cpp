@@ -5,6 +5,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
+#include "GameFinder.h"
+
 GameConfig::ActionType GameConfig::actionTypeFromString(const QString& string) {
 	using enum ActionType;
 	if (string == "command") {
@@ -43,12 +45,38 @@ std::optional<GameConfig> GameConfig::parse(const QString& path) {
 	}
 
 	QJsonDocument configJson = QJsonDocument::fromJson(config.toUtf8());
-	if (!configJson.isArray()) {
+	if (!configJson.isObject()) {
 		return std::nullopt;
 	}
-	QJsonArray sections = configJson.array();
+	QJsonObject configObject = configJson.object();
 
 	GameConfig gameConfig;
+
+	if (!configObject.contains("type") || !configObject["type"].isString()) {
+		return std::nullopt;
+	}
+	auto configType = configObject["type"].toString();
+
+	if (configType == "steam") {
+		if (!configObject.contains("appid") || !configObject["appid"].isString()) {
+			return std::nullopt;
+		}
+		gameConfig.appId = configObject["appid"].toString().toUInt();
+		gameConfig.root = GameFinder::getGameInstallPath(gameConfig.appId);
+	} else if (configType == "custom") {
+		if (!configObject.contains("root") || !configObject["root"].isString()) {
+			return std::nullopt;
+		}
+		gameConfig.root = configObject["root"].toString();
+	} else {
+		return std::nullopt;
+	}
+
+	if (!configObject.contains("sections") || !configObject["sections"].isArray()) {
+		return std::nullopt;
+	}
+	QJsonArray sections = configObject["sections"].toArray();
+
 	for (const auto& sectionValue : sections) {
 		if (!sectionValue.isObject()) {
 			continue;
@@ -108,8 +136,4 @@ std::optional<GameConfig> GameConfig::parse(const QString& path) {
 		}
 	}
 	return gameConfig;
-}
-
-const QList<GameConfig::Section>& GameConfig::getSections() const {
-	return this->sections;
 }

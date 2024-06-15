@@ -4,11 +4,13 @@
 
 #include <QApplication>
 #include <QDesktopServices>
+#include <QFileDialog>
 #include <QLabel>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QProcess>
 #include <QScrollArea>
+#include <QSettings>
 #include <QStyle>
 #include <QStyleHints>
 #include <QToolButton>
@@ -53,6 +55,8 @@ QIcon getExecutableIcon(const QString& path) {
 
 constexpr int FIXED_WINDOW_WIDTH = 256;
 
+constexpr std::string_view STR_LAST_CONFIG = "str_last_config";
+
 } // namespace
 
 Window::Window(QWidget* parent)
@@ -60,14 +64,42 @@ Window::Window(QWidget* parent)
 	this->setWindowTitle(PROJECT_NAME.data());
 	this->setFixedSize(FIXED_WINDOW_WIDTH, 450);
 
-	// Edit menu
-	//auto* editMenu = this->menuBar()->addMenu(tr("Edit"));
-	//editMenu->addAction(this->style()->standardIcon(QStyle::SP_DialogCancelButton), tr("Exit"), Qt::ALT | Qt::Key_F4, [this] {
-	//	this->close();
-	//});
+	// Profile menu
+	auto* configMenu = this->menuBar()->addMenu(tr("Config"));
+
+	auto* gameConfigMenu = configMenu->addMenu(this->style()->standardIcon(QStyle::SP_FileDialogListView), tr("Open Game Config"));
+	if (!GameFinder::getGameInstallPath(440000).isEmpty()) {
+		gameConfigMenu->addAction(GameFinder::getGameIcon(440000), "Portal 2: Community Edition", [this] {
+			this->loadGameConfig(":/config/440000.json");
+		});
+	}
+	if (!GameFinder::getGameInstallPath(601360).isEmpty()) {
+		gameConfigMenu->addAction(GameFinder::getGameIcon(601360), "Portal: Revolution", [this] {
+			this->loadGameConfig(":/config/601360.json");
+		});
+	}
+	if (!GameFinder::getGameInstallPath(1802710).isEmpty()) {
+		gameConfigMenu->addAction(GameFinder::getGameIcon(1802710), "Momentum Mod", [this] {
+			this->loadGameConfig(":/config/1802710.json");
+		});
+	}
+
+	configMenu->addSeparator();
+
+	configMenu->addAction(this->style()->standardIcon(QStyle::SP_FileIcon), tr("New Custom Config"), Qt::CTRL | Qt::Key_N, [this] {
+		// todo: config creator
+	});
+
+	configMenu->addAction(this->style()->standardIcon(QStyle::SP_DirIcon), tr("Open Custom Config"), Qt::CTRL | Qt::Key_O, [this] {
+		auto filename = QFileDialog::getOpenFileName(this, tr("Open Config"));
+		if (!filename.isEmpty()) {
+			this->loadGameConfig(filename);
+		}
+	});
 
 	// Help menu
 	auto* helpMenu = this->menuBar()->addMenu(tr("Help"));
+
 	helpMenu->addAction(this->style()->standardIcon(QStyle::SP_DialogHelpButton), tr("About"), Qt::Key_F1, [this] {
 		QMessageBox about(this);
 		about.setWindowTitle(tr("About"));
@@ -75,6 +107,7 @@ Window::Window(QWidget* parent)
 		about.setText(QString("## %1\n*Created by Strata Source Contributors*\n<br/>\n").arg(PROJECT_TITLE.data()));
 		about.exec();
 	});
+
 	helpMenu->addAction(this->style()->standardIcon(QStyle::SP_DialogHelpButton), tr("About Qt"), Qt::ALT | Qt::Key_F1, [this] {
 		QMessageBox::aboutQt(this);
 	});
@@ -92,12 +125,15 @@ Window::Window(QWidget* parent)
 
 	new QVBoxLayout(main);
 
-	auto appId = GameFinder::getDefaultGameAppId();
-	this->setWindowIcon(GameFinder::getGameIcon(appId));
-	this->loadGameConfig(QString(":/config/%1.json").arg(appId), GameFinder::getGameInstallPath(appId), appId);
+	if (QSettings settings; !settings.contains(STR_LAST_CONFIG)) {
+		auto appId = GameFinder::getDefaultGameAppId();
+		this->loadGameConfig(QString(":/config/%1.json").arg(appId));
+	} else {
+		this->loadGameConfig(settings.value(STR_LAST_CONFIG).toString());
+	}
 }
 
-void Window::loadGameConfig(const QString& path, const QString& installDir, unsigned int appId) {
+void Window::loadGameConfig(const QString& path) {
 	auto* layout = dynamic_cast<QVBoxLayout*>(this->main->layout());
 	::clearLayout(layout);
 
@@ -107,6 +143,13 @@ void Window::loadGameConfig(const QString& path, const QString& installDir, unsi
 		layout->addWidget(test);
 		layout->addStretch();
 		return;
+	}
+
+	QSettings settings;
+	settings.setValue(STR_LAST_CONFIG, path);
+
+	if (auto appId = gameConfig->getAppId()) {
+		this->setWindowIcon(GameFinder::getGameIcon(appId));
 	}
 
 	for (int i = 0; i < gameConfig->getSections().size(); i++) {
@@ -134,9 +177,9 @@ void Window::loadGameConfig(const QString& path, const QString& installDir, unsi
 
 			bool iconSet = false;
 			if (!entry.iconOverride.isEmpty()) {
-				if (entry.iconOverride == "${GAME_ICON}" && appId) {
-					if (auto icon = GameFinder::getGameIcon(appId); !icon.isNull()) {
-						button->setIcon(GameFinder::getGameIcon(appId));
+				if (entry.iconOverride == "${GAME_ICON}" && gameConfig->getAppId()) {
+					if (auto icon = GameFinder::getGameIcon(gameConfig->getAppId()); !icon.isNull()) {
+						button->setIcon(icon);
 					} else {
 						button->setIcon(this->style()->standardIcon(QStyle::SP_FileLinkIcon));
 					}
@@ -153,7 +196,7 @@ void Window::loadGameConfig(const QString& path, const QString& installDir, unsi
 			}
 
 			QString action = entry.action;
-			action.replace("${ROOT}", installDir);
+			action.replace("${ROOT}", gameConfig->getRoot());
 			if (action.endsWith('/') || action.endsWith('\\')) {
 				action = action.sliced(0, action.size() - 1);
 			}

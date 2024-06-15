@@ -11,7 +11,8 @@ If you are working on a mod and would like to use this SDK launcher for your mod
 you can create a config called `sdk_launcher_default.json` and place it next to the
 SDK launcher executable. It will load this config file when the config history is
 clean, so anyone running this application for the first time will load your mod's
-provided config immediately.
+provided config immediately. Alternatively, if you'd rather not ship this application
+with your mod, simply ship the config and tell your developers to load it.
 
 ### Config Format
 

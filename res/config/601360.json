@@ -5,7 +5,7 @@
       {
         "name": "Portal: Revolution - Dev Mode",
         "type": "command",
-        "action": "${ROOT}/bin/win64/revolution.exe",
+        "action": "${ROOT}/bin/win64/revolution",
         "arguments": ["-dev", "-console"],
         "icon_override": "${GAME_ICON}",
         "os": "windows"
@@ -13,7 +13,7 @@
       {
         "name": "Portal: Revolution - Dev && Tools Mode",
         "type": "command",
-        "action": "${ROOT}/bin/win64/revolution.exe",
+        "action": "${ROOT}/bin/win64/revolution",
         "arguments": ["-dev", "-console", "-tools"],
         "icon_override": "${GAME_ICON}",
         "os": "windows"
@@ -24,23 +24,23 @@
     "name": "Tools",
     "entries": [
       {
-        "name": "Hammer World Editor",
+        "name": "Hammer Editor",
         "type": "command",
-        "action": "${ROOT}/bin/win64/hammer.exe",
+        "action": "${ROOT}/bin/win64/hammer",
         "arguments": ["-game", "../../revolution"],
         "os": "windows"
       },
       {
         "name": "Model Viewer",
         "type": "command",
-        "action": "${ROOT}/bin/win64/hlmv.exe",
+        "action": "${ROOT}/bin/win64/hlmv",
         "arguments": ["-game", "../../revolution"],
         "os": "windows"
       },
       {
         "name": "Face Poser",
         "type": "command",
-        "action": "${ROOT}/bin/win64/hlfaceposer.exe",
+        "action": "${ROOT}/bin/win64/hlfaceposer",
         "arguments": ["-game", "../../revolution"],
         "os": "windows"
       }

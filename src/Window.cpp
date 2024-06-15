@@ -156,7 +156,7 @@ void Window::loadGameConfig(const QString& path, const QString& installDir, unsi
 				case GameConfig::ActionType::COMMAND:
 					if (!iconSet) {
 #ifdef _WIN32
-						if (auto icon = ::getExecutableIcon(action); !icon.isNull()) {
+						if (auto icon = ::getExecutableIcon(action + ".exe"); !icon.isNull()) {
 							button->setIcon(icon);
 						} else {
 							button->setIcon(this->style()->standardIcon(QStyle::SP_FileLinkIcon));

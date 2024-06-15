@@ -1,0 +1,59 @@
+[
+  {
+    "name": "Game",
+    "entries": [
+      {
+        "name": "Momentum Mod - Dev Mode",
+        "type": "command",
+        "action": "${ROOT}/bin/win64/chaos.exe",
+        "arguments": ["-game", "momentum", "-dev", "-console"],
+        "icon_override": "${GAME_ICON}",
+        "os": "windows"
+      },
+      {
+        "name": "Momentum Mod - Dev && Tools Mode",
+        "type": "command",
+        "action": "${ROOT}/bin/win64/chaos.exe",
+        "arguments": ["-game", "momentum", "-dev", "-console", "-tools"],
+        "icon_override": "${GAME_ICON}",
+        "os": "windows"
+      }
+    ]
+  },
+  {
+    "name": "Tools",
+    "entries": [
+      {
+        "name": "Hammer World Editor",
+        "type": "command",
+        "action": "${ROOT}/bin/win64/hammer.exe",
+        "arguments": ["-game", "../../momentum"],
+        "os": "windows"
+      },
+      {
+        "name": "Model Viewer",
+        "type": "command",
+        "action": "${ROOT}/bin/win64/hlmv.exe",
+        "arguments": ["-game", "../../momentum"],
+        "os": "windows"
+      },
+      {
+        "name": "Face Poser",
+        "type": "command",
+        "action": "${ROOT}/bin/win64/hlfaceposer.exe",
+        "arguments": ["-game", "../../momentum"],
+        "os": "windows"
+      }
+    ]
+  },
+  {
+    "name": "Documentation",
+    "entries": [
+      {
+        "name": "Momentum Mod Wiki",
+        "type": "link",
+        "action": "https://wiki.stratasource.org/momentum"
+      }
+    ]
+  }
+]

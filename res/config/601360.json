@@ -1,0 +1,59 @@
+[
+  {
+    "name": "Game",
+    "entries": [
+      {
+        "name": "Portal: Revolution - Dev Mode",
+        "type": "command",
+        "action": "${ROOT}/bin/win64/revolution.exe",
+        "arguments": ["-dev", "-console"],
+        "icon_override": "${GAME_ICON}",
+        "os": "windows"
+      },
+      {
+        "name": "Portal: Revolution - Dev && Tools Mode",
+        "type": "command",
+        "action": "${ROOT}/bin/win64/revolution.exe",
+        "arguments": ["-dev", "-console", "-tools"],
+        "icon_override": "${GAME_ICON}",
+        "os": "windows"
+      }
+    ]
+  },
+  {
+    "name": "Tools",
+    "entries": [
+      {
+        "name": "Hammer World Editor",
+        "type": "command",
+        "action": "${ROOT}/bin/win64/hammer.exe",
+        "arguments": ["-game", "../../revolution"],
+        "os": "windows"
+      },
+      {
+        "name": "Model Viewer",
+        "type": "command",
+        "action": "${ROOT}/bin/win64/hlmv.exe",
+        "arguments": ["-game", "../../revolution"],
+        "os": "windows"
+      },
+      {
+        "name": "Face Poser",
+        "type": "command",
+        "action": "${ROOT}/bin/win64/hlfaceposer.exe",
+        "arguments": ["-game", "../../revolution"],
+        "os": "windows"
+      }
+    ]
+  },
+  {
+    "name": "Documentation",
+    "entries": [
+      {
+        "name": "Strata Wiki",
+        "type": "link",
+        "action": "https://wiki.stratasource.org"
+      }
+    ]
+  }
+]

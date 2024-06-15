@@ -1,0 +1,3 @@
+[submodule "ext/sapp"]
+	path = ext/sapp
+	url = https://github.com/craftablescience/SteamAppPathProvider

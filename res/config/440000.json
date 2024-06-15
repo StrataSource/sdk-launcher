@@ -1,0 +1,79 @@
+[
+  {
+    "name": "Game",
+    "entries": [
+      {
+        "name": "Portal 2: CE - Dev Mode",
+        "type": "command",
+        "action": "${ROOT}/bin/win64/chaos.exe",
+        "arguments": ["-game", "p2ce", "-dev", "-console"],
+        "icon_override": "${GAME_ICON}",
+        "os": "windows"
+      },
+      {
+        "name": "Portal 2: CE - Dev && Tools Mode",
+        "type": "command",
+        "action": "${ROOT}/bin/win64/chaos.exe",
+        "arguments": ["-game", "p2ce", "-dev", "-console", "-tools"],
+        "icon_override": "${GAME_ICON}",
+        "os": "windows"
+      }
+    ]
+  },
+  {
+    "name": "Tools",
+    "entries": [
+      {
+        "name": "Hammer World Editor",
+        "type": "command",
+        "action": "${ROOT}/bin/win64/hammer.exe",
+        "arguments": ["-game", "../../p2ce"],
+        "os": "windows"
+      },
+      {
+        "name": "Model Viewer",
+        "type": "command",
+        "action": "${ROOT}/bin/win64/hlmv.exe",
+        "arguments": ["-game", "../../p2ce"],
+        "os": "windows"
+      },
+      {
+        "name": "Face Poser",
+        "type": "command",
+        "action": "${ROOT}/bin/win64/hlfaceposer.exe",
+        "arguments": ["-game", "../../p2ce"],
+        "os": "windows"
+      }
+    ]
+  },
+  {
+    "name": "Documentation",
+    "entries": [
+      {
+        "name": "Portal 2: CE Wiki",
+        "type": "link",
+        "action": "https://wiki.stratasource.org/p2ce"
+      }
+    ]
+  },
+  {
+    "name": "Folders",
+    "entries": [
+      {
+        "name": "Custom Folder",
+        "type": "directory",
+        "action": "${ROOT}/p2ce/custom"
+      },
+      {
+        "name": "SDK Content",
+        "type": "directory",
+        "action": "${ROOT}/sdk_content"
+      },
+      {
+        "name": "SDK Tools",
+        "type": "directory",
+        "action": "${ROOT}/sdk_tools"
+      }
+    ]
+  }
+]

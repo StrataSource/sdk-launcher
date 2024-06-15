@@ -232,8 +232,33 @@ void Window::loadGameConfig(const QString& path) {
 						button->setIcon(this->style()->standardIcon(QStyle::SP_FileLinkIcon));
 #endif
 					}
-					QObject::connect(button, &QToolButton::clicked, this, [action, args=entry.arguments, cwd=gameConfig->getRoot()] {
-						QProcess::startDetached(action, args, cwd);
+					QObject::connect(button, &QToolButton::clicked, this, [this, action, args=entry.arguments, cwd=gameConfig->getRoot()] {
+						auto* process = new QProcess;
+						QObject::connect(process, &QProcess::errorOccurred, this, [this](QProcess::ProcessError code) {
+							QString error;
+							switch (code) {
+								using enum QProcess::ProcessError;
+								case FailedToStart:
+									error = tr("The process failed to start. Perhaps the executable it points to might not exist?");
+									break;
+								case Crashed:
+									error = tr("The process crashed.");
+									break;
+								case Timedout:
+									error = tr("The process timed out.");
+									break;
+								case ReadError:
+								case WriteError:
+									error = tr("The process hit an I/O error.");
+									break;
+								case UnknownError:
+									error = tr("The process hit an unknown error.");
+									break;
+							}
+							QMessageBox::critical(this, tr("Error"), tr("An error occurred executing this command: %1").arg(error));
+						});
+						process->setWorkingDirectory(cwd);
+						process->start(action, args);
 					});
 					break;
 				case GameConfig::ActionType::LINK:

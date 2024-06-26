@@ -9,7 +9,9 @@ the executable to `bin/win64` or `bin/linux64` (depending on your OS).
 
 If you would like to modify the config loaded at startup, create a config next to
 the SDK launcher executable called `SDKLauncherDefault.json`. The SDK launcher will
-load this config file instead of the internal config.
+load this config file instead of the internal config. Alternatively, it will
+automatically load the last loaded config file, so you can load your config manually
+once and it will load that config on subsequent launches.
 
 ### Config Format
 

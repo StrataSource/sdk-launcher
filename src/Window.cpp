@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QProcess>
 #include <QScrollArea>
+#include <QSettings>
 #include <QStyle>
 #include <QStyleHints>
 #include <QToolButton>
@@ -51,6 +52,8 @@ QIcon getExecutableIcon(const QString& path) {
 
 constexpr int FIXED_WINDOW_WIDTH = 256;
 
+constexpr std::string_view STR_RECENT_CONFIGS = "str_recent_configs";
+
 } // namespace
 
 Window::Window(QWidget* parent)
@@ -59,27 +62,26 @@ Window::Window(QWidget* parent)
 	this->setFixedSize(FIXED_WINDOW_WIDTH, 450);
 
 	// Icon
-	if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
-		this->setWindowIcon(QIcon{":/icons/strata_dark.png"});
-	} else {
-		this->setWindowIcon(QIcon{":/icons/strata_light.png"});
-	}
+	this->setWindowIcon(getStrataIcon());
 
 	// Profile menu
 	auto* configMenu = this->menuBar()->addMenu(tr("Config"));
 
-	configMenu->addAction("Load Default", [this] {
+	this->loadDefault = configMenu->addAction("Load Default", [this] {
 		this->loadGameConfig(QString(":/config/%1.json").arg(PROJECT_DEFAULT_MOD.data()));
 	});
 
 	configMenu->addSeparator();
 
-	configMenu->addAction(this->style()->standardIcon(QStyle::SP_DirIcon), tr("Load Custom"), Qt::CTRL | Qt::Key_O, [this] {
+	configMenu->addAction(this->style()->standardIcon(QStyle::SP_DirIcon), tr("Load Custom..."), Qt::CTRL | Qt::Key_O, [this] {
 		auto filename = QFileDialog::getOpenFileName(this, tr("Open Config"));
 		if (!filename.isEmpty()) {
 			this->loadGameConfig(filename);
 		}
 	});
+
+	this->recent = configMenu->addMenu(this->style()->standardIcon(QStyle::SP_FileDialogDetailedView), tr("Load Recent..."));
+	// Will be regenerated naturally later on
 
 	// Help menu
 	auto* helpMenu = this->menuBar()->addMenu(tr("Help"));
@@ -87,6 +89,7 @@ Window::Window(QWidget* parent)
 	helpMenu->addAction(this->style()->standardIcon(QStyle::SP_DialogHelpButton), tr("About"), Qt::Key_F1, [this] {
 		QMessageBox about(this);
 		about.setWindowTitle(tr("About"));
+		about.setIconPixmap(getStrataIcon().pixmap(64, 64));
 		about.setTextFormat(Qt::TextFormat::MarkdownText);
 		about.setText(QString("## %1\n*Created by Strata Source Contributors*\n<br/>\n").arg(PROJECT_TITLE.data()));
 		about.exec();
@@ -109,11 +112,23 @@ Window::Window(QWidget* parent)
 
 	new QVBoxLayout(this->main);
 
-	if (auto defaultConfigPath = QCoreApplication::applicationDirPath() + "/SDKLauncherDefault.json"; QFile::exists(defaultConfigPath)) {
-		this->loadGameConfig(defaultConfigPath);
+	if (QSettings settings; !settings.contains(STR_RECENT_CONFIGS)) {
+		settings.setValue(STR_RECENT_CONFIGS, QStringList{});
+		if (auto defaultConfigPath = QCoreApplication::applicationDirPath() + "/SDKLauncherDefault.json"; QFile::exists(defaultConfigPath)) {
+			this->loadGameConfig(defaultConfigPath);
+		} else {
+			this->loadGameConfig(QString(":/config/%1.json").arg(PROJECT_DEFAULT_MOD.data()));
+		}
 	} else {
-		this->loadGameConfig(QString(":/config/%1.json").arg(PROJECT_DEFAULT_MOD.data()));
+		this->loadGameConfig(settings.value(STR_RECENT_CONFIGS).value<QStringList>().first());
 	}
+}
+
+QIcon Window::getStrataIcon() {
+	if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
+		return QIcon{":/icons/strata_dark.png"};
+	}
+	return QIcon{":/icons/strata_light.png"};
 }
 
 void Window::loadGameConfig(const QString& path) {
@@ -128,13 +143,31 @@ void Window::loadGameConfig(const QString& path) {
 		return;
 	}
 
+	QSettings settings;
+	auto recentConfigs = settings.value(STR_RECENT_CONFIGS).value<QStringList>();
+	if (recentConfigs.contains(path)) {
+		recentConfigs.removeAt(recentConfigs.indexOf(path));
+	}
+	recentConfigs.push_front(path);
+	if (recentConfigs.size() > 10) {
+		recentConfigs.pop_back();
+	}
+	settings.setValue(STR_RECENT_CONFIGS, recentConfigs);
+	this->regenerateRecentConfigs();
+
 	QString rootPath = QCoreApplication::applicationDirPath();
 	if (gameConfig->getUsesLegacyBinDir()) {
 		rootPath += "/..";
 	} else {
 		rootPath += "/../..";
 	}
+
 	QIcon gameIcon{QString("%1/%2/resource/%3").arg(rootPath, gameConfig->getGame(), gameConfig->getGameIcon())};
+	if (!gameIcon.isNull() && !gameIcon.availableSizes().isEmpty()) {
+		this->loadDefault->setIcon(gameIcon);
+	} else {
+		this->loadDefault->setIcon(this->style()->standardIcon(QStyle::SP_FileLinkIcon));
+	}
 
 	for (int i = 0; i < gameConfig->getSections().size(); i++) {
 		auto& section = gameConfig->getSections()[i];
@@ -168,11 +201,7 @@ void Window::loadGameConfig(const QString& path) {
 						button->setIcon(this->style()->standardIcon(QStyle::SP_FileLinkIcon));
 					}
 				} else if (entry.iconOverride == "${STRATA_ICON}") {
-					if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
-						button->setIcon(QIcon{":/icons/strata_dark.png"});
-					} else {
-						button->setIcon(QIcon{":/icons/strata_light.png"});
-					}
+					button->setIcon(getStrataIcon());
 				} else {
 					button->setIcon(QIcon{entry.iconOverride});
 				}
@@ -263,4 +292,25 @@ void Window::loadGameConfig(const QString& path) {
 	}
 
 	layout->addStretch();
+}
+
+void Window::regenerateRecentConfigs() {
+	this->recent->clear();
+
+	auto paths = QSettings().value(STR_RECENT_CONFIGS).value<QStringList>();
+	if (paths.empty()) {
+		auto* noRecentFilesAction = this->recent->addAction(tr("No recent files."));
+		noRecentFilesAction->setDisabled(true);
+		return;
+	}
+	for (int i = 0; i < paths.size(); i++) {
+		this->recent->addAction(("&%1: \"" + paths[i] + "\"").arg((i + 1) % 10), [this, path=paths[i]] {
+			this->loadGameConfig(path);
+		});
+	}
+	this->recent->addSeparator();
+	this->recent->addAction(tr("Clear"), [this] {
+		QSettings().setValue(STR_RECENT_CONFIGS, QStringList{});
+		this->regenerateRecentConfigs();
+	});
 }

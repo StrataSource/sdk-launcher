@@ -5,8 +5,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-#include "GameFinder.h"
-
 GameConfig::ActionType GameConfig::actionTypeFromString(const QString& string) {
 	using enum ActionType;
 	if (string == "command") {
@@ -52,24 +50,19 @@ std::optional<GameConfig> GameConfig::parse(const QString& path) {
 
 	GameConfig gameConfig;
 
-	if (!configObject.contains("type") || !configObject["type"].isString()) {
+	if (!configObject.contains("game") || !configObject["game"].isString()) {
 		return std::nullopt;
 	}
-	auto configType = configObject["type"].toString();
+	gameConfig.game = configObject["game"].toString();
 
-	if (configType == "steam") {
-		if (!configObject.contains("appid") || !configObject["appid"].isString()) {
-			return std::nullopt;
-		}
-		gameConfig.appId = configObject["appid"].toString().toUInt();
-		gameConfig.root = GameFinder::getGameInstallPath(gameConfig.appId);
-	} else if (configType == "custom") {
-		if (!configObject.contains("root") || !configObject["root"].isString()) {
-			return std::nullopt;
-		}
-		gameConfig.root = configObject["root"].toString();
+	if (configObject.contains("game_icon") && configObject["game_icon"].isString()) {
+		gameConfig.gameIcon = configObject["game_icon"].toString();
 	} else {
-		return std::nullopt;
+		gameConfig.gameIcon = "game.ico";
+	}
+
+	if (configObject.contains("uses_legacy_bin_dir") && configObject["uses_legacy_bin_dir"].isBool()) {
+		gameConfig.usesLegacyBinDir = configObject["uses_legacy_bin_dir"].toBool();
 	}
 
 	if (!configObject.contains("sections") || !configObject["sections"].isArray()) {

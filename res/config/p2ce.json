@@ -1,6 +1,5 @@
 {
-  "type": "steam",
-  "appid": "440000",
+  "game": "p2ce",
   "sections": [
     {
       "name": "Game",

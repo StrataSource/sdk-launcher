@@ -1,8 +1,8 @@
 <RCC>
     <qresource prefix="/">
-        <file>config/440000.json</file>
-        <file>config/601360.json</file>
-        <file>config/1802710.json</file>
+        <file>config/momentum.json</file>
+        <file>config/p2ce.json</file>
+        <file>config/revolution.json</file>
 
         <file>icons/strata_dark.png</file>
         <file>icons/strata_light.png</file>

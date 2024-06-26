@@ -1,22 +1,21 @@
 {
-  "type": "steam",
-  "appid": "601360",
+  "game": "momentum",
   "sections": [
     {
       "name": "Game",
       "entries": [
         {
-          "name": "Portal: Revolution - Dev Mode",
+          "name": "Momentum Mod - Dev Mode",
           "type": "command",
-          "action": "${ROOT}/bin/${PLATFORM}/revolution",
-          "arguments": ["-dev", "-console"],
+          "action": "${ROOT}/bin/${PLATFORM}/chaos",
+          "arguments": ["-game", "momentum", "-dev", "-console"],
           "icon_override": "${GAME_ICON}"
         },
         {
-          "name": "Portal: Revolution - Dev && Tools Mode",
+          "name": "Momentum Mod - Dev && Tools Mode",
           "type": "command",
-          "action": "${ROOT}/bin/${PLATFORM}/revolution",
-          "arguments": ["-dev", "-console", "-tools"],
+          "action": "${ROOT}/bin/${PLATFORM}/chaos",
+          "arguments": ["-game", "momentum", "-dev", "-console", "-tools"],
           "icon_override": "${GAME_ICON}"
         }
       ]
@@ -28,21 +27,21 @@
           "name": "Hammer Editor",
           "type": "command",
           "action": "${ROOT}/bin/win64/hammer",
-          "arguments": ["-game", "revolution"],
+          "arguments": ["-game", "momentum"],
           "os": "windows"
         },
         {
           "name": "Model Viewer",
           "type": "command",
           "action": "${ROOT}/bin/win64/hlmv",
-          "arguments": ["-game", "revolution"],
+          "arguments": ["-game", "momentum"],
           "os": "windows"
         },
         {
           "name": "Face Poser",
           "type": "command",
           "action": "${ROOT}/bin/win64/hlfaceposer",
-          "arguments": ["-game", "revolution"],
+          "arguments": ["-game", "momentum"],
           "os": "windows"
         }
       ]
@@ -51,15 +50,15 @@
       "name": "Links",
       "entries": [
         {
-          "name": "Strata Wiki",
+          "name": "Momentum Mod Wiki",
           "type": "link",
-          "action": "https://wiki.stratasource.org",
-          "icon_override": "${STRATA_ICON}"
+          "action": "https://wiki.stratasource.org/momentum",
+          "icon_override": "${GAME_ICON}"
         },
         {
-          "name": "Portal: Revolution Issue Tracker",
+          "name": "Momentum Mod Issue Tracker",
           "type": "link",
-          "action": "https://github.com/SecondFaceSoftware/PortalRevolution-Issues/issues",
+          "action": "https://github.com/momentum-mod/game/issues",
           "icon_override": "${GAME_ICON}"
         },
         {

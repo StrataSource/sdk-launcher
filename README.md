@@ -7,33 +7,24 @@ the executable to `bin/win64` or `bin/linux64` (depending on your OS).
 
 ### Default Config
 
-If you are working on a mod and would like to use this SDK launcher for your mod,
-you can create a config called `sdk_launcher_default.json` and place it next to the
-SDK launcher executable. It will load this config file when the config history is
-clean, so anyone running this application for the first time will load your mod's
-provided config immediately. Alternatively, if you'd rather not ship this application
-with your mod, simply ship the config and tell your developers to load it.
+If you would like to modify the config loaded at startup, create a config next to
+the SDK launcher executable called `SDKLauncherDefault.json`. The SDK launcher will
+load this config file instead of the internal config.
 
 ### Config Format
 
-Here is an example config file that may be imported into the SDK launcher.
+Here is an example config file that may be loaded into the SDK launcher.
 
 **Comments are added for clarity, but they are NOT allowed in actual configs!**
 
 ```json5
 {
-  // Type can be "steam" or "custom".
-  "type": "steam",
-  // If the type is "steam", it will look for the AppId of the app here,
-  // as well as automatically fill out the root path.
-  "appid": "440000",
-  // If the type is "custom", rather than have an AppId, it just has the
-  // path to the root of the game/mod here. This path is allowed to be relative.
-  "root": ".",
-  // To be clear, if the type is steam, appid is required but root should not be
-  // present. If the type is custom, appid should not be present, but root should be.
-  // You will most likely use the custom type.
-
+  // The name of the game directory
+  "game": "p2ce",
+  // Optional, the default is game.ico (searches in the <game>/resource/ directory)
+  "game_icon": "game.ico",
+  // Optional, the default is false (set this to true if the SDK launcher is inside bin/ instead of bin/<platform>/)
+  "uses_legacy_bin_dir": false,
   // Sections hold titled groups of buttons
   "sections": [
     {

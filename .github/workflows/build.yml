@@ -18,7 +18,7 @@ jobs:
       matrix:
         build_type: [Debug, Release]
         compiler: [msvc]
-        target: [p2ce, momentum]
+        target: [p2ce, momentum, revolution]
     runs-on: windows-latest
     defaults:
       run:
@@ -47,24 +47,19 @@ jobs:
           modules: ${{env.QT_MODULES}}
           cache: true
 
-      - name: Configure CMake [target:p2ce]
-        if: ${{matrix.target == 'p2ce'}}
-        run: cmake -G "Ninja" -B "${{env.BUILD_DIR}}" -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DQT_BASEDIR="${{github.workspace}}/qt/Qt/${{env.QT_VERSION}}/msvc2019_64" -DSDK_LAUNCHER_USE_LTO=ON -DSDK_LAUNCHER_DEFAULT_APPID=440000
-
-      - name: Configure CMake [target:momentum]
-        if: ${{matrix.target == 'momentum'}}
-        run: cmake -G "Ninja" -B "${{env.BUILD_DIR}}" -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DQT_BASEDIR="${{github.workspace}}/qt/Qt/${{env.QT_VERSION}}/msvc2019_64" -DSDK_LAUNCHER_USE_LTO=ON -DSDK_LAUNCHER_DEFAULT_APPID=1802710
+      - name: Configure CMake
+        run: cmake -G "Ninja" -B "${{env.BUILD_DIR}}" -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DQT_BASEDIR="${{github.workspace}}/qt/Qt/${{env.QT_VERSION}}/msvc2019_64" -DSDK_LAUNCHER_USE_LTO=ON -DSDK_LAUNCHER_DEFAULT_MOD="${{matrix.target}}"
 
       - name: Build SDK Launcher
         working-directory: '${{env.BUILD_DIR}}'
         run: |
-          cmake --build . --config ${{matrix.build_type}} -t sdk_launcher -- -j%NUMBER_OF_PROCESSORS%
+          cmake --build . --config ${{matrix.build_type}} -t SDKLauncher -- -j%NUMBER_OF_PROCESSORS%
 
       - name: Upload SDK Launcher
         uses: actions/upload-artifact@v4
         with:
-          name: 'SDK_Launcher-${{matrix.target}}-Windows-${{matrix.compiler}}-${{matrix.build_type}}'
-          path: ${{env.BUILD_DIR}}/sdk_launcher.exe
+          name: 'SDKLauncher-${{matrix.target}}-Windows-${{matrix.compiler}}-${{matrix.build_type}}'
+          path: ${{env.BUILD_DIR}}/SDKLauncher.exe
           retention-days: 7
 
   build-linux:
@@ -72,7 +67,7 @@ jobs:
       matrix:
         build_type: [Debug, Release]
         compiler: [gcc]
-        target: [p2ce, momentum]
+        target: [p2ce, momentum, revolution]
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout Repository
@@ -102,21 +97,16 @@ jobs:
           modules: ${{env.QT_MODULES}}
           cache: true
 
-      - name: Configure CMake [target:p2ce]
-        if: ${{matrix.target == 'p2ce'}}
-        run: cmake -G "Ninja" -B "${{env.BUILD_DIR}}" -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DQT_BASEDIR="${{github.workspace}}/qt/Qt/${{env.QT_VERSION}}/gcc_64" -DSDK_LAUNCHER_USE_LTO=ON -DSDK_LAUNCHER_DEFAULT_APPID=440000
-
-      - name: Configure CMake [target:momentum]
-        if: ${{matrix.target == 'momentum'}}
-        run: cmake -G "Ninja" -B "${{env.BUILD_DIR}}" -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DQT_BASEDIR="${{github.workspace}}/qt/Qt/${{env.QT_VERSION}}/gcc_64" -DSDK_LAUNCHER_USE_LTO=ON -DSDK_LAUNCHER_DEFAULT_APPID=1802710
+      - name: Configure CMake
+        run: cmake -G "Ninja" -B "${{env.BUILD_DIR}}" -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DQT_BASEDIR="${{github.workspace}}/qt/Qt/${{env.QT_VERSION}}/gcc_64" -DSDK_LAUNCHER_USE_LTO=ON -DSDK_LAUNCHER_DEFAULT_MOD="${{matrix.target}}"
 
       - name: Build SDK Launcher
         working-directory: '${{env.BUILD_DIR}}'
-        run: cmake --build . --config ${{matrix.build_type}} -t sdk_launcher -- -j$(nproc)
+        run: cmake --build . --config ${{matrix.build_type}} -t SDKLauncher -- -j$(nproc)
 
       - name: Fixup Binaries
         run: |
-          chmod +x '${{env.BUILD_DIR}}/sdk_launcher'
+          chmod +x '${{env.BUILD_DIR}}/SDKLauncher'
 
           # runpath cleanup for the Qt binaries. These are (mostly) wrong, leading to crashes
           for f in ${{env.BUILD_DIR}}/*.so*; do
@@ -131,8 +121,8 @@ jobs:
       - name: Upload SDK Launcher
         uses: actions/upload-artifact@v4
         with:
-          name: 'SDK_Launcher-${{matrix.target}}-Linux-${{matrix.compiler}}-${{matrix.build_type}}'
-          path: ${{env.BUILD_DIR}}/sdk_launcher
+          name: 'SDKLauncher-${{matrix.target}}-Linux-${{matrix.compiler}}-${{matrix.build_type}}'
+          path: ${{env.BUILD_DIR}}/SDKLauncher
           retention-days: 7
 
   deploy:

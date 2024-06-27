@@ -76,7 +76,7 @@ jobs:
           submodules: recursive
 
       - name: Install Necessary Packages
-        run: sudo apt update && sudo apt install -y cmake build-essential ninja-build chrpath
+        run: sudo apt update && sudo apt install -y cmake build-essential ninja-build
 
       - name: Install GCC [compiler:gcc]
         if: ${{matrix.compiler == 'gcc'}}
@@ -103,20 +103,6 @@ jobs:
       - name: Build SDK Launcher
         working-directory: '${{env.BUILD_DIR}}'
         run: cmake --build . --config ${{matrix.build_type}} -t SDKLauncher -- -j$(nproc)
-
-      - name: Fixup Binaries
-        run: |
-          chmod +x '${{env.BUILD_DIR}}/SDKLauncher'
-
-          # runpath cleanup for the Qt binaries. These are (mostly) wrong, leading to crashes
-          for f in ${{env.BUILD_DIR}}/*.so*; do
-            echo "Fixing $f..."
-            chrpath -r '$ORIGIN' "$f"
-          done
-          for f in ${{env.BUILD_DIR}}/*/*.so*; do
-            echo "Fixing $f..."
-            chrpath -r '$ORIGIN/..' "$f"
-          done
 
       - name: Upload SDK Launcher
         uses: actions/upload-artifact@v4

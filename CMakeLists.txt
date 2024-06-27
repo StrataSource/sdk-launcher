@@ -152,5 +152,3 @@ target_include_directories(
         "${QT_INCLUDE}/QtCore"
         "${QT_INCLUDE}/QtGui"
         "${QT_INCLUDE}/QtWidgets")
-
-set_target_properties(${PROJECT_TARGET_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "C:/Program Files (x86)/Steam/steamapps/common/Portal 2 Community Edition/bin/win64")

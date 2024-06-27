@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 # Create project
 project(sdk_launcher
         DESCRIPTION "A minimal SDK launcher for Strata Source engine games"
-        VERSION "0.2.0"
+        VERSION "0.3.0"
         HOMEPAGE_URL "https://github.com/StrataSource/sdk-launcher")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -152,3 +152,5 @@ target_include_directories(
         "${QT_INCLUDE}/QtCore"
         "${QT_INCLUDE}/QtGui"
         "${QT_INCLUDE}/QtWidgets")
+
+set_target_properties(${PROJECT_TARGET_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "C:/Program Files (x86)/Steam/steamapps/common/Portal 2 Community Edition/bin/win64")

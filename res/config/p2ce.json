@@ -1,5 +1,6 @@
 {
-  "game": "p2ce",
+  "game_default": "p2ce",
+  "window_height": 575,
   "sections": [
     {
       "name": "Game",
@@ -8,14 +9,14 @@
           "name": "Portal 2: CE - Dev Mode",
           "type": "command",
           "action": "${ROOT}/bin/${PLATFORM}/chaos",
-          "arguments": ["-game", "p2ce", "-dev", "-console"],
+          "arguments": ["-game", "${GAME}", "-dev", "-console"],
           "icon_override": "${GAME_ICON}"
         },
         {
           "name": "Portal 2: CE - Dev && Tools Mode",
           "type": "command",
           "action": "${ROOT}/bin/${PLATFORM}/chaos",
-          "arguments": ["-game", "p2ce", "-dev", "-console", "-tools"],
+          "arguments": ["-game", "${GAME}", "-dev", "-console", "-tools"],
           "icon_override": "${GAME_ICON}"
         }
       ]
@@ -27,21 +28,21 @@
           "name": "Hammer Editor",
           "type": "command",
           "action": "${ROOT}/bin/win64/hammer",
-          "arguments": ["-game", "p2ce"],
+          "arguments": ["-game", "${GAME}"],
           "os": "windows"
         },
         {
           "name": "Model Viewer",
           "type": "command",
           "action": "${ROOT}/bin/win64/hlmv",
-          "arguments": ["-game", "p2ce"],
+          "arguments": ["-game", "${GAME}"],
           "os": "windows"
         },
         {
           "name": "Face Poser",
           "type": "command",
           "action": "${ROOT}/bin/win64/hlfaceposer",
-          "arguments": ["-game", "p2ce"],
+          "arguments": ["-game", "${GAME}"],
           "os": "windows"
         },
         {
@@ -58,7 +59,7 @@
           "name": "Workshop Uploader",
           "type": "command",
           "action": "${ROOT}/bin/${PLATFORM}/workshopgui",
-          "arguments": ["-game", "p2ce"]
+          "arguments": ["-game", "${GAME}"]
         }
       ]
     },

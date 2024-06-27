@@ -22,11 +22,15 @@ Here is an example config file that may be loaded into the SDK launcher.
 ```json5
 {
   // The name of the game directory
-  "game": "p2ce",
-  // Optional, the default is game.ico (searches in the <game>/resource/ directory)
-  "game_icon": "game.ico",
-  // Optional, the default is false (set this to true if the SDK launcher is inside bin/ instead of bin/<platform>/)
+  "game_default": "p2ce",
+  // Optional, the default is "${ROOT}/${GAME}/resource/game.ico"
+  "game_icon": "${ROOT}/${GAME}/resource/game.ico",
+  // Optional, the default is false (set this to true if the SDK launcher is inside bin/ instead of bin/${PLATFORM}/)
   "uses_legacy_bin_dir": false,
+  // Optional, the default is 256 (changes the fixed width of the window)
+  "window_width": 256,
+  // Optional, the default is 450 (changes the fixed height of the window)
+  "window_height": 450,
   // Sections hold titled groups of buttons
   "sections": [
     {
@@ -44,10 +48,10 @@ Here is an example config file that may be loaded into the SDK launcher.
           // of the action is command, ".exe" will be appended to search for the
           // default icon on Windows. Link types are Internet URLs, and directory
           // types are directories that open in a file explorer.
-          "action": "${ROOT}/bin/${PLATFORM}/strata", // Expands to "./bin/win64/strata" on Windows.
+          "action": "${ROOT}/bin/${PLATFORM}/strata", // Expands to "<Game Directory>/bin/win64/strata" on Windows.
           // Arguments are optional for command-type actions, and will be passed
-          // to the command when ran.
-          "arguments": ["-game", "p2ce", "-dev"],
+          // to the command when ran. ${GAME} expands to the game directory name.
+          "arguments": ["-game", "${GAME}", "-dev"],
           // The icon override (optional) allows the config creator to change the
           // icon for any button. ${GAME_ICON} is a special keyword for steam-type
           // configs which loads the game icon from Steam. ${STRATA_ICON} is a
@@ -65,7 +69,7 @@ Here is an example config file that may be loaded into the SDK launcher.
           "name": "Portal 2: CE - Dev Mode && Tools Mode",
           "type": "command",
           "action": "${ROOT}/bin/${PLATFORM}/strata",
-          "arguments": ["-game", "p2ce", "-dev", "-tools"],
+          "arguments": ["-game", "${GAME}", "-dev", "-tools"],
           "icon_override": "${GAME_ICON}"
         }
       ]

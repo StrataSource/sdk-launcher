@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QFileDialog>
+#include <QInputDialog>
 #include <QLabel>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -50,24 +51,28 @@ QIcon getExecutableIcon(const QString& path) {
 }
 #endif
 
-constexpr int FIXED_WINDOW_WIDTH = 256;
-
 constexpr std::string_view STR_RECENT_CONFIGS = "str_recent_configs";
+constexpr std::string_view STR_GAME_OVERRIDE = "str_game_override";
 
 } // namespace
 
 Window::Window(QWidget* parent)
 		: QMainWindow(parent) {
 	this->setWindowTitle(PROJECT_NAME.data());
-	this->setFixedSize(FIXED_WINDOW_WIDTH, 450);
+
+	// Default settings (recent configs are set later on)
+	QSettings settings;
+	if (!settings.contains(STR_GAME_OVERRIDE)) {
+		settings.setValue(STR_GAME_OVERRIDE, QString(PROJECT_DEFAULT_MOD.data()));
+	}
 
 	// Icon
-	this->setWindowIcon(getStrataIcon());
+	this->setWindowIcon(QIcon{getStrataIconPath()});
 
-	// Profile menu
+	// Config menu
 	auto* configMenu = this->menuBar()->addMenu(tr("Config"));
 
-	this->loadDefault = configMenu->addAction("Load Default", [this] {
+	this->config_loadDefault = configMenu->addAction("Load Default", Qt::CTRL | Qt::Key_R, [this] {
 		this->loadGameConfig(QString(":/config/%1.json").arg(PROJECT_DEFAULT_MOD.data()));
 	});
 
@@ -83,13 +88,34 @@ Window::Window(QWidget* parent)
 	this->recent = configMenu->addMenu(this->style()->standardIcon(QStyle::SP_FileDialogDetailedView), tr("Load Recent..."));
 	// Will be regenerated naturally later on
 
+	// Game menu
+	auto* gameMenu = this->menuBar()->addMenu(tr("Game"));
+
+	this->game_resetToDefault = gameMenu->addAction(tr("Reset to Default"), [this] {
+		QSettings settings;
+		settings.setValue(STR_GAME_OVERRIDE, QString(PROJECT_DEFAULT_MOD.data()));
+		this->game_overrideGame->setText(tr("Override \"%1\"").arg(settings.value(STR_GAME_OVERRIDE).toString()));
+		this->loadGameConfig(settings.value(STR_RECENT_CONFIGS).toStringList().first());
+	});
+
+	gameMenu->addSeparator();
+
+	this->game_overrideGame = gameMenu->addAction(tr("Override \"%1\"").arg(settings.value(STR_GAME_OVERRIDE).toString()), [this] {
+		if (auto text = QInputDialog::getText(this, tr("Set Game Override"), tr("New game folder to use:")); !text.isEmpty()) {
+			QSettings settings;
+			settings.setValue(STR_GAME_OVERRIDE, text);
+			this->game_overrideGame->setText(tr("Override \"%1\"").arg(settings.value(STR_GAME_OVERRIDE).toString()));
+			this->loadGameConfig(settings.value(STR_RECENT_CONFIGS).toStringList().first());
+		}
+	});
+
 	// Help menu
 	auto* helpMenu = this->menuBar()->addMenu(tr("Help"));
 
 	helpMenu->addAction(this->style()->standardIcon(QStyle::SP_DialogHelpButton), tr("About"), Qt::Key_F1, [this] {
 		QMessageBox about(this);
 		about.setWindowTitle(tr("About"));
-		about.setIconPixmap(getStrataIcon().pixmap(64, 64));
+		about.setIconPixmap(QIcon{getStrataIconPath()}.pixmap(64, 64));
 		about.setTextFormat(Qt::TextFormat::MarkdownText);
 		about.setText(QString("## %1\n*Created by Strata Source Contributors*\n<br/>\n").arg(PROJECT_TITLE.data()));
 		about.exec();
@@ -112,7 +138,7 @@ Window::Window(QWidget* parent)
 
 	new QVBoxLayout(this->main);
 
-	if (QSettings settings; !settings.contains(STR_RECENT_CONFIGS)) {
+	if (!settings.contains(STR_RECENT_CONFIGS)) {
 		settings.setValue(STR_RECENT_CONFIGS, QStringList{});
 		if (auto defaultConfigPath = QCoreApplication::applicationDirPath() + "/SDKLauncherDefault.json"; QFile::exists(defaultConfigPath)) {
 			this->loadGameConfig(defaultConfigPath);
@@ -124,11 +150,11 @@ Window::Window(QWidget* parent)
 	}
 }
 
-QIcon Window::getStrataIcon() {
+QString Window::getStrataIconPath() {
 	if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
-		return QIcon{":/icons/strata_dark.png"};
+		return ":/icons/strata_dark.png";
 	}
-	return QIcon{":/icons/strata_light.png"};
+	return ":/icons/strata_light.png";
 }
 
 void Window::loadGameConfig(const QString& path) {
@@ -143,6 +169,8 @@ void Window::loadGameConfig(const QString& path) {
 		return;
 	}
 
+	this->setFixedSize(gameConfig->getWindowWidth(), gameConfig->getWindowHeight());
+
 	QSettings settings;
 	auto recentConfigs = settings.value(STR_RECENT_CONFIGS).value<QStringList>();
 	if (recentConfigs.contains(path)) {
@@ -155,19 +183,52 @@ void Window::loadGameConfig(const QString& path) {
 	settings.setValue(STR_RECENT_CONFIGS, recentConfigs);
 	this->regenerateRecentConfigs();
 
+	// Set ${ROOT}
 	QString rootPath = QCoreApplication::applicationDirPath();
 	if (gameConfig->getUsesLegacyBinDir()) {
 		rootPath += "/..";
 	} else {
 		rootPath += "/../..";
 	}
+	gameConfig->setVariable("ROOT", rootPath);
 
-	QIcon gameIcon{QString("%1/%2/resource/%3").arg(rootPath, gameConfig->getGame(), gameConfig->getGameIcon())};
-	if (!gameIcon.isNull() && !gameIcon.availableSizes().isEmpty()) {
-		this->loadDefault->setIcon(gameIcon);
+	// Set ${PLATFORM}
+#if defined(_WIN32)
+	gameConfig->setVariable("PLATFORM", "win64");
+#elif defined(__APPLE__)
+	gameConfig->setVariable("PLATFORM", "osx64");
+#elif defined(__linux__)
+	gameConfig->setVariable("PLATFORM", "linux64");
+#else
+	#warning "Unknown platform! ${PLATFORM} will not be substituted!"
+#endif
+
+	// tiny hack: get default game icon before ${GAME} substitution
+	QString defaultGameIconPath = gameConfig->getGameIcon();
+	defaultGameIconPath.replace("${GAME}", PROJECT_DEFAULT_MOD.data());
+	if (QIcon defaultGameIcon{defaultGameIconPath}; !defaultGameIcon.isNull() && !defaultGameIcon.availableSizes().isEmpty()) {
+		this->config_loadDefault->setIcon(defaultGameIcon);
+		this->game_resetToDefault->setIcon(defaultGameIcon);
 	} else {
-		this->loadDefault->setIcon(this->style()->standardIcon(QStyle::SP_FileLinkIcon));
+		this->config_loadDefault->setIcon(this->style()->standardIcon(QStyle::SP_FileLinkIcon));
+		this->game_resetToDefault->setIcon(this->style()->standardIcon(QStyle::SP_FileLinkIcon));
 	}
+
+	// Set ${GAME}
+	QString gameDir = settings.contains(STR_GAME_OVERRIDE) ? settings.value(STR_GAME_OVERRIDE).toString() : gameConfig->getGameDefault();
+	gameConfig->setVariable("GAME", gameDir);
+
+	// Set ${GAME_ICON}
+	if (QIcon gameIcon{gameConfig->getGameIcon()}; !gameIcon.isNull() && !gameIcon.availableSizes().isEmpty()) {
+		this->game_overrideGame->setIcon(gameIcon);
+		gameConfig->setVariable("GAME_ICON", gameConfig->getGameIcon());
+	} else {
+		this->game_overrideGame->setIcon(this->style()->standardIcon(QStyle::SP_FileLinkIcon));
+		gameConfig->setVariable("GAME_ICON", "");
+	}
+
+	// Set ${STRATA_ICON}
+	gameConfig->setVariable("STRATA_ICON", getStrataIconPath());
 
 	for (int i = 0; i < gameConfig->getSections().size(); i++) {
 		auto& section = gameConfig->getSections()[i];
@@ -180,7 +241,7 @@ void Window::loadGameConfig(const QString& path) {
 		line->setFrameShape(QFrame::HLine);
 		layout->addWidget(line);
 
-		for (const auto& entry : section.entries) {
+		for (auto& entry : section.entries) {
 			auto* button = new QToolButton(this->main);
 			button->setStyleSheet(
 					"QToolButton          { background-color: rgba(  0,   0, 0,  0); border: none; }\n"
@@ -189,42 +250,23 @@ void Window::loadGameConfig(const QString& path) {
 			button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 			button->setText(entry.name);
 			button->setIconSize({16, 16});
-			button->setFixedWidth(FIXED_WINDOW_WIDTH - 18);
+			button->setFixedWidth(gameConfig->getWindowWidth() - 18);
 			layout->addWidget(button);
 
 			bool iconSet = false;
 			if (!entry.iconOverride.isEmpty()) {
-				if (entry.iconOverride == "${GAME_ICON}") {
-					if (!gameIcon.isNull() && !gameIcon.availableSizes().isEmpty()) {
-						button->setIcon(gameIcon);
-					} else {
-						button->setIcon(this->style()->standardIcon(QStyle::SP_FileLinkIcon));
-					}
-				} else if (entry.iconOverride == "${STRATA_ICON}") {
-					button->setIcon(getStrataIcon());
-				} else {
-					button->setIcon(QIcon{entry.iconOverride});
-				}
+				button->setIcon(QIcon{entry.iconOverride});
 				iconSet = true;
 			}
 
 			QString action = entry.action;
-			action.replace("${ROOT}", rootPath);
-#if defined(_WIN32)
-			action.replace("${PLATFORM}", "win64");
-#elif defined(__APPLE__)
-			action.replace("${PLATFORM}", "osx64");
-#elif defined(__linux__)
-			action.replace("${PLATFORM}", "linux64");
-#else
-			#warning "Unknown platform! ${PLATFORM} will not be substituted!"
-#endif
 			if (action.endsWith('/') || action.endsWith('\\')) {
 				action = action.sliced(0, action.size() - 1);
 			}
 			switch (entry.type) {
 				case GameConfig::ActionType::INVALID:
 					button->setIcon(this->style()->standardIcon(QStyle::SP_MessageBoxCritical));
+					button->setToolTip(tr("This button has an invalid type. Check the config for any spelling errors."));
 					break;
 				case GameConfig::ActionType::COMMAND:
 					if (!iconSet) {
@@ -238,6 +280,7 @@ void Window::loadGameConfig(const QString& path) {
 						button->setIcon(this->style()->standardIcon(QStyle::SP_FileLinkIcon));
 #endif
 					}
+					button->setToolTip(action + " " + entry.arguments.join(" "));
 					QObject::connect(button, &QToolButton::clicked, this, [this, action, args=entry.arguments, cwd=rootPath] {
 						auto* process = new QProcess;
 						QObject::connect(process, &QProcess::errorOccurred, this, [this](QProcess::ProcessError code) {
@@ -271,6 +314,7 @@ void Window::loadGameConfig(const QString& path) {
 					if (!iconSet) {
 						button->setIcon(this->style()->standardIcon(QStyle::SP_MessageBoxInformation));
 					}
+					button->setToolTip(action);
 					QObject::connect(button, &QToolButton::clicked, this, [action] {
 						QDesktopServices::openUrl({action});
 					});
@@ -279,6 +323,7 @@ void Window::loadGameConfig(const QString& path) {
 					if (!iconSet) {
 						button->setIcon(this->style()->standardIcon(QStyle::SP_DirLinkIcon));
 					}
+					button->setToolTip(action);
 					QObject::connect(button, &QToolButton::clicked, this, [action] {
 						QDesktopServices::openUrl({QString("file:///") + action});
 					});

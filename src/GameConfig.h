@@ -4,6 +4,9 @@
 #include <QList>
 #include <QString>
 
+constexpr int DEFAULT_WINDOW_WIDTH = 256;
+constexpr int DEFAULT_WINDOW_HEIGHT = 450;
+
 class GameConfig {
 public:
 	enum class ActionType : unsigned char {
@@ -39,18 +42,26 @@ public:
 
 	[[nodiscard]] static std::optional<GameConfig> parse(const QString& path);
 
-	[[nodiscard]] const QString& getGame() const { return this->game; }
+	[[nodiscard]] const QString& getGameDefault() const { return this->gameDefault; }
 
 	[[nodiscard]] const QString& getGameIcon() const { return this->gameIcon; }
 
 	[[nodiscard]] bool getUsesLegacyBinDir() const { return this->usesLegacyBinDir; }
 
+	[[nodiscard]] int getWindowWidth() const { return this->windowWidth; }
+
+	[[nodiscard]] int getWindowHeight() const { return this->windowHeight; }
+
 	[[nodiscard]] const QList<Section>& getSections() const { return this->sections; }
 
+	void setVariable(const QString& variable, const QString& replacement);
+
 private:
-	QString game;
+	QString gameDefault;
 	QString gameIcon;
 	bool usesLegacyBinDir = false;
+	int windowWidth = DEFAULT_WINDOW_WIDTH;
+	int windowHeight = DEFAULT_WINDOW_HEIGHT;
 	QList<Section> sections;
 
 	GameConfig() = default;

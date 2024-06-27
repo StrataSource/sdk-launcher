@@ -50,19 +50,27 @@ std::optional<GameConfig> GameConfig::parse(const QString& path) {
 
 	GameConfig gameConfig;
 
-	if (!configObject.contains("game") || !configObject["game"].isString()) {
+	if (!configObject.contains("game_default") || !configObject["game_default"].isString()) {
 		return std::nullopt;
 	}
-	gameConfig.game = configObject["game"].toString();
+	gameConfig.gameDefault = configObject["game_default"].toString();
 
 	if (configObject.contains("game_icon") && configObject["game_icon"].isString()) {
 		gameConfig.gameIcon = configObject["game_icon"].toString();
 	} else {
-		gameConfig.gameIcon = "game.ico";
+		gameConfig.gameIcon = "${ROOT}/${GAME}/resource/game.ico";
 	}
 
 	if (configObject.contains("uses_legacy_bin_dir") && configObject["uses_legacy_bin_dir"].isBool()) {
 		gameConfig.usesLegacyBinDir = configObject["uses_legacy_bin_dir"].toBool();
+	}
+
+	if (configObject.contains("window_width")) {
+		gameConfig.windowWidth = configObject["window_width"].toInt(DEFAULT_WINDOW_WIDTH);
+	}
+
+	if (configObject.contains("window_height")) {
+		gameConfig.windowHeight = configObject["window_height"].toInt(DEFAULT_WINDOW_HEIGHT);
 	}
 
 	if (!configObject.contains("sections") || !configObject["sections"].isArray()) {
@@ -129,4 +137,22 @@ std::optional<GameConfig> GameConfig::parse(const QString& path) {
 		}
 	}
 	return gameConfig;
+}
+
+void GameConfig::setVariable(const QString& variable, const QString& replacement) {
+	const auto setVar = [&variable, &replacement](QString& str) {
+		str.replace(QString("${%1}").arg(variable), replacement);
+	};
+	setVar(this->gameIcon);
+	for (auto& section : this->sections) {
+		setVar(section.name);
+		for (auto& entry : section.entries) {
+			setVar(entry.name);
+			setVar(entry.action);
+			for (auto& argument : entry.arguments) {
+				setVar(argument);
+			}
+			setVar(entry.iconOverride);
+		}
+	}
 }

@@ -56,6 +56,8 @@ public:
 
 	void setVariable(const QString& variable, const QString& replacement);
 
+	void finalize();
+
 private:
 	QString gameDefault;
 	QString gameIcon;
@@ -63,6 +65,7 @@ private:
 	int windowWidth = DEFAULT_WINDOW_WIDTH;
 	int windowHeight = DEFAULT_WINDOW_HEIGHT;
 	QList<Section> sections;
+	bool finalized = false;
 
 	GameConfig() = default;
 };

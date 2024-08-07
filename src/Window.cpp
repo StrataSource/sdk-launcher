@@ -230,6 +230,9 @@ void Window::loadGameConfig(const QString& path) {
 	// Set ${STRATA_ICON}
 	gameConfig->setVariable("STRATA_ICON", getStrataIconPath());
 
+	// Done with variables, necessary to fix up paths
+	gameConfig->finalize();
+
 	for (int i = 0; i < gameConfig->getSections().size(); i++) {
 		auto& section = gameConfig->getSections()[i];
 

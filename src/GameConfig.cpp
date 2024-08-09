@@ -1,5 +1,6 @@
 #include "GameConfig.h"
 
+#include <QDir>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -140,6 +141,9 @@ std::optional<GameConfig> GameConfig::parse(const QString& path) {
 }
 
 void GameConfig::setVariable(const QString& variable, const QString& replacement) {
+	if (this->finalized) {
+		return;
+	}
 	const auto setVar = [&variable, &replacement](QString& str) {
 		str.replace(QString("${%1}").arg(variable), replacement);
 	};
@@ -155,4 +159,17 @@ void GameConfig::setVariable(const QString& variable, const QString& replacement
 			setVar(entry.iconOverride);
 		}
 	}
+}
+
+void GameConfig::finalize() {
+	for (auto& section : this->sections) {
+		for (auto& entry : section.entries) {
+			if (entry.type == ActionType::COMMAND || entry.type == ActionType::DIRECTORY) {
+				if (auto cleanPath = QDir::cleanPath(entry.action); !cleanPath.isEmpty()) {
+					entry.action = cleanPath;
+				}
+			}
+		}
+	}
+	this->finalized = true;
 }

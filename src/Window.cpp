@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QNetworkAccessManager>
 #include <QProcess>
 #include <QScrollArea>
 #include <QSettings>
@@ -17,6 +18,7 @@
 
 #include "Config.h"
 #include "GameConfig.h"
+#include "NewModDialog.h"
 
 #ifdef _WIN32
 #include <shlobj_core.h>
@@ -109,6 +111,13 @@ Window::Window(QWidget* parent)
 		}
 	});
 
+	// Mod menu
+	auto* modMenu = this->menuBar()->addMenu(tr("Mod"));
+
+	modMenu->addAction(this->style()->standardIcon(QStyle::SP_FileIcon), tr("Create New Mod"), [this] {
+		NewModDialog::open(this->network, this);
+	});
+
 	// Help menu
 	auto* helpMenu = this->menuBar()->addMenu(tr("Help"));
 
@@ -148,6 +157,9 @@ Window::Window(QWidget* parent)
 	} else {
 		this->loadGameConfig(settings.value(STR_RECENT_CONFIGS).value<QStringList>().first());
 	}
+
+	// Create network access manager
+	this->network = new QNetworkAccessManager{this};
 }
 
 QString Window::getStrataIconPath() {
@@ -229,6 +241,9 @@ void Window::loadGameConfig(const QString& path) {
 
 	// Set ${STRATA_ICON}
 	gameConfig->setVariable("STRATA_ICON", getStrataIconPath());
+
+	// Done with variables, necessary to fix up paths
+	gameConfig->finalize();
 
 	for (int i = 0; i < gameConfig->getSections().size(); i++) {
 		auto& section = gameConfig->getSections()[i];

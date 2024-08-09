@@ -4,6 +4,7 @@
 
 class QAction;
 class QMenu;
+class QNetworkAccessManager;
 
 class Window : public QMainWindow {
 	Q_OBJECT;
@@ -24,4 +25,6 @@ private:
 	QAction* game_overrideGame;
 
 	QWidget* main;
+
+	QNetworkAccessManager* network;
 };

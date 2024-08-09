@@ -18,10 +18,14 @@ public:
 	void regenerateRecentConfigs();
 
 private:
+	bool configUsingLegacyBinDir;
+	QString configModTemplateURL;
+
 	QMenu* recent;
 	QAction* config_loadDefault;
 	QAction* game_resetToDefault;
 	QAction* game_overrideGame;
+	QAction* utilities_createNewMod;
 
 	QWidget* main;
 };

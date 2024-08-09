@@ -66,12 +66,12 @@ std::optional<GameConfig> GameConfig::parse(const QString& path) {
 		gameConfig.usesLegacyBinDir = configObject["uses_legacy_bin_dir"].toBool();
 	}
 
-	if (configObject.contains("window_width")) {
-		gameConfig.windowWidth = configObject["window_width"].toInt(DEFAULT_WINDOW_WIDTH);
-	}
-
 	if (configObject.contains("window_height")) {
 		gameConfig.windowHeight = configObject["window_height"].toInt(DEFAULT_WINDOW_HEIGHT);
+	}
+
+	if (configObject.contains("mod_template_url") && configObject["mod_template_url"].isString()) {
+		gameConfig.modTemplateURL = configObject["mod_template_url"].toString();
 	}
 
 	if (!configObject.contains("sections") || !configObject["sections"].isArray()) {
@@ -141,9 +141,6 @@ std::optional<GameConfig> GameConfig::parse(const QString& path) {
 }
 
 void GameConfig::setVariable(const QString& variable, const QString& replacement) {
-	if (this->finalized) {
-		return;
-	}
 	const auto setVar = [&variable, &replacement](QString& str) {
 		str.replace(QString("${%1}").arg(variable), replacement);
 	};
@@ -159,17 +156,4 @@ void GameConfig::setVariable(const QString& variable, const QString& replacement
 			setVar(entry.iconOverride);
 		}
 	}
-}
-
-void GameConfig::finalize() {
-	for (auto& section : this->sections) {
-		for (auto& entry : section.entries) {
-			if (entry.type == ActionType::COMMAND || entry.type == ActionType::DIRECTORY) {
-				if (auto cleanPath = QDir::cleanPath(entry.action); !cleanPath.isEmpty()) {
-					entry.action = cleanPath;
-				}
-			}
-		}
-	}
-	this->finalized = true;
 }

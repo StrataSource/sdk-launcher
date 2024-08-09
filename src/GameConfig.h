@@ -48,24 +48,23 @@ public:
 
 	[[nodiscard]] bool getUsesLegacyBinDir() const { return this->usesLegacyBinDir; }
 
-	[[nodiscard]] int getWindowWidth() const { return this->windowWidth; }
+	[[nodiscard]] int getWindowWidth() const { return DEFAULT_WINDOW_WIDTH; }
 
 	[[nodiscard]] int getWindowHeight() const { return this->windowHeight; }
+
+	[[nodiscard]] const QString& getModTemplateURL() const { return this->modTemplateURL; }
 
 	[[nodiscard]] const QList<Section>& getSections() const { return this->sections; }
 
 	void setVariable(const QString& variable, const QString& replacement);
 
-	void finalize();
-
 private:
 	QString gameDefault;
 	QString gameIcon;
 	bool usesLegacyBinDir = false;
-	int windowWidth = DEFAULT_WINDOW_WIDTH;
 	int windowHeight = DEFAULT_WINDOW_HEIGHT;
+	QString modTemplateURL;
 	QList<Section> sections;
-	bool finalized = false;
 
 	GameConfig() = default;
 };

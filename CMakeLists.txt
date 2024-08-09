@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 # Create project
 project(sdk_launcher
         DESCRIPTION "A minimal SDK launcher for Strata Source engine games"
-        VERSION "0.3.0"
+        VERSION "0.4.0"
         HOMEPAGE_URL "https://github.com/StrataSource/sdk-launcher")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -102,6 +102,9 @@ function(sdk_launcher_configure_target TARGET)
     endif()
 endfunction()
 
+# miniz
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/ext/miniz")
+
 # Qt
 if(WIN32 AND NOT DEFINED QT_BASEDIR)
     message(FATAL_ERROR "Please define your QT install dir with -DQT_BASEDIR=\"C:/your/qt6/here\"")
@@ -123,7 +126,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Network)
 
 # Generate config header
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/Config.h.in" "${CMAKE_CURRENT_SOURCE_DIR}/src/Config.h")
@@ -135,6 +138,8 @@ add_executable(${PROJECT_TARGET_NAME} WIN32
         "${CMAKE_CURRENT_SOURCE_DIR}/src/GameConfig.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/GameConfig.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Main.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/NewModDialog.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/NewModDialog.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Window.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Window.h")
 
@@ -142,13 +147,16 @@ sdk_launcher_configure_target(${PROJECT_TARGET_NAME})
 
 target_link_libraries(
         ${PROJECT_TARGET_NAME} PRIVATE
+        miniz
         Qt::Core
         Qt::Gui
-        Qt::Widgets)
+        Qt::Widgets
+        Qt::Network)
 
 target_include_directories(
         ${PROJECT_TARGET_NAME} PRIVATE
         "${QT_INCLUDE}"
         "${QT_INCLUDE}/QtCore"
         "${QT_INCLUDE}/QtGui"
-        "${QT_INCLUDE}/QtWidgets")
+        "${QT_INCLUDE}/QtWidgets"
+        "${QT_INCLUDE}/QtNetwork")

@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <QDesktopServices>
+#include <QDir>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QLabel>
@@ -17,6 +18,7 @@
 
 #include "Config.h"
 #include "GameConfig.h"
+#include "NewModDialog.h"
 
 #ifdef _WIN32
 #include <shlobj_core.h>
@@ -40,7 +42,7 @@ void clearLayout(QLayout* layout, bool deleteWidgets = true) {
 }
 
 #ifdef _WIN32
-QIcon getExecutableIcon(const QString& path) {
+[[nodiscard]] QIcon getExecutableIcon(const QString& path) {
 	HICON hIcon;
 	if (SHDefExtractIconA(path.toLocal8Bit().constData(), 0, 0, &hIcon, nullptr, 16) != S_OK) {
 		return QIcon{};
@@ -51,13 +53,27 @@ QIcon getExecutableIcon(const QString& path) {
 }
 #endif
 
+[[nodiscard]] QString getRootPath(bool usesLegacyBinDir) {
+	QString rootPath = QCoreApplication::applicationDirPath();
+	if (usesLegacyBinDir) {
+		rootPath += "/..";
+	} else {
+		rootPath += "/../..";
+	}
+	if (auto cleanPath = QDir::cleanPath(rootPath); !cleanPath.isEmpty()) {
+		return cleanPath;
+	}
+	return rootPath;
+}
+
 constexpr std::string_view STR_RECENT_CONFIGS = "str_recent_configs";
 constexpr std::string_view STR_GAME_OVERRIDE = "str_game_override";
 
 } // namespace
 
 Window::Window(QWidget* parent)
-		: QMainWindow(parent) {
+		: QMainWindow(parent)
+		, configUsingLegacyBinDir(false) {
 	this->setWindowTitle(PROJECT_NAME.data());
 
 	// Default settings (recent configs are set later on)
@@ -107,6 +123,13 @@ Window::Window(QWidget* parent)
 			this->game_overrideGame->setText(tr("Override \"%1\"").arg(settings.value(STR_GAME_OVERRIDE).toString()));
 			this->loadGameConfig(settings.value(STR_RECENT_CONFIGS).toStringList().first());
 		}
+	});
+
+	// Utilities menu
+	auto* utilitiesMenu = this->menuBar()->addMenu(tr("Utilities"));
+
+	this->utilities_createNewMod = utilitiesMenu->addAction(this->style()->standardIcon(QStyle::SP_FileIcon), tr("Create New Mod"), [this] {
+		NewModDialog::open(::getRootPath(this->configUsingLegacyBinDir), this->configModTemplateURL, this);
 	});
 
 	// Help menu
@@ -169,7 +192,9 @@ void Window::loadGameConfig(const QString& path) {
 		return;
 	}
 
-	this->setFixedSize(gameConfig->getWindowWidth(), gameConfig->getWindowHeight());
+	this->configUsingLegacyBinDir = gameConfig->getUsesLegacyBinDir();
+	this->configModTemplateURL = gameConfig->getModTemplateURL();
+	this->utilities_createNewMod->setDisabled(this->configModTemplateURL.isEmpty());
 
 	QSettings settings;
 	auto recentConfigs = settings.value(STR_RECENT_CONFIGS).value<QStringList>();
@@ -184,12 +209,7 @@ void Window::loadGameConfig(const QString& path) {
 	this->regenerateRecentConfigs();
 
 	// Set ${ROOT}
-	QString rootPath = QCoreApplication::applicationDirPath();
-	if (gameConfig->getUsesLegacyBinDir()) {
-		rootPath += "/..";
-	} else {
-		rootPath += "/../..";
-	}
+	const auto rootPath = ::getRootPath(this->configUsingLegacyBinDir);
 	gameConfig->setVariable("ROOT", rootPath);
 
 	// Set ${PLATFORM}
@@ -229,9 +249,6 @@ void Window::loadGameConfig(const QString& path) {
 
 	// Set ${STRATA_ICON}
 	gameConfig->setVariable("STRATA_ICON", getStrataIconPath());
-
-	// Done with variables, necessary to fix up paths
-	gameConfig->finalize();
 
 	for (int i = 0; i < gameConfig->getSections().size(); i++) {
 		auto& section = gameConfig->getSections()[i];
@@ -340,6 +357,10 @@ void Window::loadGameConfig(const QString& path) {
 	}
 
 	layout->addStretch();
+
+	// Set window sizing
+	this->resize(gameConfig->getWindowWidth(), gameConfig->getWindowHeight());
+	this->setFixedWidth(gameConfig->getWindowWidth());
 }
 
 void Window::regenerateRecentConfigs() {

@@ -2,6 +2,7 @@
 
 #include <cstring>
 #include <filesystem>
+#include <utility>
 
 #include <miniz.h>
 #include <QCheckBox>
@@ -16,6 +17,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QProgressBar>
+#include <QProgressDialog>
 #include <QStandardPaths>
 
 #ifdef _WIN32
@@ -105,7 +107,7 @@ namespace {
 		return "";
 	}
 	QString result = list.first();
-	for (int i = 1; i < list.size(); ++i) {
+	for (int i = 1; i < list.size(); i++) {
 		result += separator + list[i];
 	}
 	return result;
@@ -124,7 +126,7 @@ namespace {
 	return true;
 }
 
-[[nodiscard]] bool extractZIP(const QByteArray& zip, const QString& outputDir) {
+[[nodiscard]] bool extractZIP(const QByteArray& zip, const QString& outputDir, QWidget* parent) {
 	mz_zip_archive zipArchive;
 	std::memset(&zipArchive, 0, sizeof(zipArchive));
 
@@ -135,8 +137,8 @@ namespace {
 	// Collect file data
 	QMap<int, mz_zip_archive_file_stat> files;
 	QStringList filePaths;
-	const int fileCount = mz_zip_reader_get_num_files(&zipArchive);
-	for (int i = 0; i < fileCount; i++) {
+	const unsigned int fileCount = mz_zip_reader_get_num_files(&zipArchive);
+	for (int i = 0; std::cmp_less(i, fileCount); i++) {
 		if (mz_zip_reader_is_file_a_directory(&zipArchive, i)) {
 			continue;
 		}
@@ -182,9 +184,15 @@ namespace {
 	const qsizetype rootDirLen = ::join(rootDirList, "/").length();
 
 	// Write file without root dir(s)
+	QProgressDialog progressDialog{QObject::tr("Extracting zip..."), QObject::tr("Cancel"), 0, static_cast<int>(files.size()), parent};
+	progressDialog.setWindowModality(Qt::WindowModal);
 	for (auto file = files.cbegin(); file != files.cend(); ++file) {
+		if (progressDialog.wasCanceled()) {
+			return false;
+		}
+
 		QByteArray fileData;
-		fileData.resize(file.value().m_uncomp_size);
+		fileData.resize(static_cast<qsizetype>(file.value().m_uncomp_size));
 		if (!mz_zip_reader_extract_to_mem(&zipArchive, file.key(), fileData.data(), fileData.size(), 0)) {
 			return false;
 		}
@@ -192,7 +200,10 @@ namespace {
 		if (!::writeDataToFile(fileData, outputDir + QDir::separator() + QString{file.value().m_filename}.sliced(rootDirLen))) {
 			return false;
 		}
+
+		progressDialog.setValue(progressDialog.value() + 1);
 	}
+	progressDialog.setValue(progressDialog.maximum());
 
 	mz_zip_reader_end(&zipArchive);
 	return true;
@@ -288,8 +299,8 @@ NewModDialog::NewModDialog(QString gameRoot_, QString downloadURL_, QWidget* par
 				this->downloadProgress->setRange(0, 0);
 				this->downloadProgress->setTextVisible(false);
 			} else {
-				this->downloadProgress->setRange(0, total / 1000);
-				this->downloadProgress->setValue(recv / 1000);
+				this->downloadProgress->setRange(0, static_cast<int>(total / 1000));
+				this->downloadProgress->setValue(static_cast<int>(recv / 1000));
 				this->downloadProgress->setTextVisible(true);
 			}
 		});
@@ -298,13 +309,14 @@ NewModDialog::NewModDialog(QString gameRoot_, QString downloadURL_, QWidget* par
 		QObject::connect(reply, &QNetworkReply::finished, this, [this, modInstallDir, reply] {
 			// Check for a download error
 			if (reply->error() != QNetworkReply::NoError) {
-				QMessageBox::critical(this, tr("Error"), tr("An error occurred while downloading: %1").arg(reply->errorString()));
+				QMessageBox::critical(this, tr("Error"), tr("An error occurred while downloading the mod template: %1").arg(reply->errorString()));
 				this->accept();
 				return;
 			}
 
 			// Extract zip contents in memory to destination
-			if (!::extractZIP(reply->readAll(), modInstallDir)) {
+			if (!::extractZIP(reply->readAll(), modInstallDir, this)) {
+				QDir{modInstallDir}.removeRecursively();
 				QMessageBox::critical(this, tr("Error"), tr("An error occurred while extracting the mod template."));
 				this->accept();
 				return;
@@ -312,10 +324,11 @@ NewModDialog::NewModDialog(QString gameRoot_, QString downloadURL_, QWidget* par
 
 			// Create desktop shortcut
 			if (this->addShortcutOnDesktop->isChecked()) {
+				const auto shortcutPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) + QDir::separator() + this->modID->text().trimmed();
 #ifdef _WIN32
-				QFile::link(modInstallDir, QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) + QDir::separator() + this->modID->text().trimmed() + ".lnk");
+				QFile::link(modInstallDir, shortcutPath + ".lnk");
 #else
-				QFile::link(modInstallDir, QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) + QDir::separator() + this->modID->text().trimmed());
+				QFile::link(modInstallDir, shortcutPath);
 #endif
 			}
 
@@ -340,10 +353,10 @@ QString NewModDialog::getModInstallDirParent() const {
 			return ::getSourceModsDirLocation();
 		case 1:
 			return this->gameRoot;
+		default:
 		case 2:
 			return this->parentFolderCustom->text();
 	}
-	return "";
 }
 
 QString NewModDialog::getModInstallDir() const {

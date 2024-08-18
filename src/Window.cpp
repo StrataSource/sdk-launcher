@@ -110,17 +110,19 @@ Window::Window(QWidget* parent)
 	this->game_resetToDefault = gameMenu->addAction(tr("Reset to Default"), [this] {
 		QSettings settings;
 		settings.setValue(STR_GAME_OVERRIDE, QString(PROJECT_DEFAULT_MOD.data()));
-		this->game_overrideGame->setText(tr("Override \"%1\"").arg(settings.value(STR_GAME_OVERRIDE).toString()));
+		this->game_overrideGame->setText(tr("Override \"%1\" Folder").arg(settings.value(STR_GAME_OVERRIDE).toString()));
 		this->loadGameConfig(settings.value(STR_RECENT_CONFIGS).toStringList().first());
 	});
 
 	gameMenu->addSeparator();
 
-	this->game_overrideGame = gameMenu->addAction(tr("Override \"%1\"").arg(settings.value(STR_GAME_OVERRIDE).toString()), [this] {
-		if (auto text = QInputDialog::getText(this, tr("Set Game Override"), tr("New game folder to use:")); !text.isEmpty()) {
+	this->game_overrideGame = gameMenu->addAction(tr("Override \"%1\" Folder").arg(settings.value(STR_GAME_OVERRIDE).toString()), [this] {
+		const auto rootPath = ::getRootPath(this->configUsingLegacyBinDir);
+		if (auto path = QFileDialog::getExistingDirectory(this, tr("Override Game Folder"), rootPath); !path.isEmpty()) {
+			const QDir rootDir{rootPath};
 			QSettings settings;
-			settings.setValue(STR_GAME_OVERRIDE, text);
-			this->game_overrideGame->setText(tr("Override \"%1\"").arg(settings.value(STR_GAME_OVERRIDE).toString()));
+			settings.setValue(STR_GAME_OVERRIDE, QDir::cleanPath(rootDir.relativeFilePath(path)));
+			this->game_overrideGame->setText(tr("Override \"%1\" Folder").arg(settings.value(STR_GAME_OVERRIDE).toString()));
 			this->loadGameConfig(settings.value(STR_RECENT_CONFIGS).toStringList().first());
 		}
 	});

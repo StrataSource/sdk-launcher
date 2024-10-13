@@ -18,6 +18,7 @@
 
 #include "Config.h"
 #include "GameConfig.h"
+#include "LaunchButton.h"
 #include "NewModDialog.h"
 
 #ifdef _WIN32
@@ -264,11 +265,11 @@ void Window::loadGameConfig(const QString& path) {
 		layout->addWidget(line);
 
 		for (auto& entry : section.entries) {
-			auto* button = new QToolButton(this->main);
+			auto* button = new LaunchButton(this->main);
 			button->setStyleSheet(
-					"QToolButton          { background-color: rgba(  0,   0, 0,  0); border: none; }\n"
-					"QToolButton::pressed { background-color: rgba(220, 220, 0, 32); border: none; }\n"
-					"QToolButton::hover   { background-color: rgba(220, 220, 0, 32); border: none; }");
+					"LaunchButton          { background-color: rgba(  0,   0, 0,  0); border: none; }\n"
+					"LaunchButton::pressed { background-color: rgba(220, 220, 0, 32); border: none; }\n"
+					"LaunchButton::hover   { background-color: rgba(220, 220, 0, 32); border: none; }");
 			button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 			button->setText(entry.name);
 			button->setIconSize({16, 16});
@@ -303,7 +304,7 @@ void Window::loadGameConfig(const QString& path) {
 #endif
 					}
 					button->setToolTip(action + " " + entry.arguments.join(" "));
-					QObject::connect(button, &QToolButton::clicked, this, [this, action, args=entry.arguments, cwd=rootPath] {
+					QObject::connect(button, &LaunchButton::doubleClicked, this, [this, action, args=entry.arguments, cwd=rootPath] {
 						auto* process = new QProcess;
 						QObject::connect(process, &QProcess::errorOccurred, this, [this](QProcess::ProcessError code) {
 							QString error;
@@ -337,7 +338,7 @@ void Window::loadGameConfig(const QString& path) {
 						button->setIcon(this->style()->standardIcon(QStyle::SP_MessageBoxInformation));
 					}
 					button->setToolTip(action);
-					QObject::connect(button, &QToolButton::clicked, this, [action] {
+					QObject::connect(button, &LaunchButton::doubleClicked, this, [action] {
 						QDesktopServices::openUrl({action});
 					});
 					break;
@@ -346,7 +347,7 @@ void Window::loadGameConfig(const QString& path) {
 						button->setIcon(this->style()->standardIcon(QStyle::SP_DirLinkIcon));
 					}
 					button->setToolTip(action);
-					QObject::connect(button, &QToolButton::clicked, this, [action] {
+					QObject::connect(button, &LaunchButton::doubleClicked, this, [action] {
 						QDesktopServices::openUrl({QString("file:///") + action});
 					});
 					break;

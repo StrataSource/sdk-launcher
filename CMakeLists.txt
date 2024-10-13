@@ -137,6 +137,7 @@ add_executable(${PROJECT_TARGET_NAME} WIN32
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Config.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/GameConfig.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/GameConfig.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/LaunchButton.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Main.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/NewModDialog.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/NewModDialog.h"

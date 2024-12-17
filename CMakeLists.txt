@@ -103,6 +103,7 @@ function(sdk_launcher_configure_target TARGET)
 endfunction()
 
 # miniz
+set(BUILD_NO_STDIO ON CACHE INTERNAL "" FORCE)
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/ext/miniz")
 
 # Qt

@@ -1,5 +1,6 @@
 #include "Window.h"
 
+#include <chrono>
 #include <QApplication>
 #include <QDesktopServices>
 #include <QDir>
@@ -13,7 +14,6 @@
 #include <QSettings>
 #include <QStyle>
 #include <QStyleHints>
-#include <QToolButton>
 #include <QVBoxLayout>
 
 #include "Config.h"
@@ -306,16 +306,21 @@ void Window::loadGameConfig(const QString& path) {
 					button->setToolTip(action + " " + entry.arguments.join(" "));
 					QObject::connect(button, &LaunchButton::doubleClicked, this, [this, action, args=entry.arguments, cwd=rootPath] {
 						auto* process = new QProcess;
-						QObject::connect(process, &QProcess::errorOccurred, this, [this](QProcess::ProcessError code) {
+						QObject::connect(process, &QProcess::errorOccurred, this, [this, timeStart = std::chrono::steady_clock::now()](QProcess::ProcessError code) {
 							QString error;
 							switch (code) {
 								using enum QProcess::ProcessError;
 								case FailedToStart:
 									error = tr("The process failed to start. Perhaps the executable it points to might not exist?");
 									break;
-								case Crashed:
+								case Crashed: {
+									auto timeEnd = std::chrono::steady_clock::now();
+									if (std::chrono::duration<float, std::milli>(timeEnd - timeStart).count() > 30'000) {
+										return;
+									}
 									error = tr("The process crashed.");
 									break;
+								}
 								case Timedout:
 									error = tr("The process timed out.");
 									break;

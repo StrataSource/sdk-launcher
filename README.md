@@ -1,6 +1,6 @@
 # SDK Launcher
 
-A minimal SDK launcher for Strata Source engine games.
+An SDK launcher for Strata Source engine games.
 
 To install, download the latest release for the given game and extract
 the executable to `bin/win64` or `bin/linux64` (depending on your OS).

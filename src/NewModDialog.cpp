@@ -7,6 +7,7 @@
 #include <miniz.h>
 #include <QCheckBox>
 #include <QComboBox>
+#include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QDir>
 #include <QFile>
@@ -228,7 +229,7 @@ NewModDialog::NewModDialog(QString gameRoot_, QString downloadURL_, QWidget* par
 
 	this->parentFolder = new QComboBox{this};
 	if (knowsSourcemodsDirLocation) {
-		this->parentFolder->addItem("Steam's SourceMods Folder");
+		this->parentFolder->addItem(tr("Steam's SourceMods Folder"));
 	}
 	this->parentFolder->addItem(tr("Game Folder"));
 	this->parentFolder->addItem(tr("Custom Location"));
@@ -240,7 +241,7 @@ NewModDialog::NewModDialog(QString gameRoot_, QString downloadURL_, QWidget* par
 	layout->addRow(parentFolderCustomLabel, this->parentFolderCustom);
 
 	this->modID = new QLineEdit{this};
-	this->modID->setPlaceholderText("For example: p2ce, revolution, portal2");
+	this->modID->setPlaceholderText(tr("For example: p2ce, revolution, portal2"));
 	layout->addRow(tr("Mod ID"), this->modID);
 
 	this->addShortcutOnDesktop = new QCheckBox{this};
@@ -335,6 +336,7 @@ NewModDialog::NewModDialog(QString gameRoot_, QString downloadURL_, QWidget* par
 			// If installing to sourcemods, tell user they will need to restart steam
 			if (this->parentFolder->count() == 3 && this->parentFolder->currentIndex() == 0) {
 				QMessageBox::information(this, tr("Info"), tr("Your mod has been installed to Steam's SourceMods folder, which means it will show up in your Steam library! This requires you to restart Steam once."));
+				QDesktopServices::openUrl({QString("file:///") + modInstallDir});
 			}
 
 			this->accept();

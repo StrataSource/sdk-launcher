@@ -17,6 +17,13 @@
           "action": "${ROOT}/bin/${PLATFORM}/revolution",
           "arguments": ["-game", "${GAME}", "-dev", "-console", "-tools"],
           "icon_override": "${GAME_ICON}"
+        },
+        {
+          "name": "Portal: Revolution - Safe Mode (No Custom Content)",
+          "type": "command",
+          "action": "${ROOT}/bin/${PLATFORM}/chaos",
+          "arguments": ["-game", "${GAME}", "-nousermount", "-nocustommount"],
+          "icon_override": "${GAME_ICON}"
         }
       ]
     },
@@ -27,7 +34,6 @@
           "name": "Hammer Editor",
           "type": "command",
           "action": "${ROOT}/bin/win64/hammer",
-          "arguments": ["-game", "${GAME}"],
           "os": "windows"
         },
         {

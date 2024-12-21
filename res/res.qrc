@@ -4,6 +4,7 @@
         <file>config/p2ce.json</file>
         <file>config/revolution.json</file>
 
+        <file>icons/p2ce_sdk.png</file>
         <file>icons/strata_dark.png</file>
         <file>icons/strata_light.png</file>
     </qresource>

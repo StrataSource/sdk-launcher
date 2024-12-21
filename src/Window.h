@@ -28,6 +28,7 @@ private:
 	QAction* game_resetToDefault;
 	QAction* game_overrideGame;
 	QAction* utilities_createNewMod;
+	QAction* utilities_createNewAddon;
 
 	QWidget* main;
 };

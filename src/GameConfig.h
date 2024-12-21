@@ -54,6 +54,8 @@ public:
 
 	[[nodiscard]] const QString& getModTemplateURL() const { return this->modTemplateURL; }
 
+	[[nodiscard]] bool supportsP2CEAddons() const { return this->p2ceAddonsSupported; }
+
 	[[nodiscard]] const QList<Section>& getSections() const { return this->sections; }
 
 	void setVariable(const QString& variable, const QString& replacement);
@@ -64,6 +66,7 @@ private:
 	bool usesLegacyBinDir = false;
 	int windowHeight = DEFAULT_WINDOW_HEIGHT;
 	QString modTemplateURL;
+	bool p2ceAddonsSupported = false;
 	QList<Section> sections;
 
 	GameConfig() = default;

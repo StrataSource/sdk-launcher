@@ -13,6 +13,8 @@ public:
 
 	[[nodiscard]] static QString getStrataIconPath();
 
+	[[nodiscard]] static QString getSDKLauncherIconPath();
+
 	void loadGameConfig(const QString& path);
 
 	void regenerateRecentConfigs();

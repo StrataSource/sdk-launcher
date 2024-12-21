@@ -76,6 +76,7 @@ Window::Window(QWidget* parent)
 		: QMainWindow(parent)
 		, configUsingLegacyBinDir(false) {
 	this->setWindowTitle(PROJECT_NAME.data());
+	this->setMinimumHeight(400);
 
 	// Default settings (recent configs are set later on)
 	QSettings settings;
@@ -84,7 +85,7 @@ Window::Window(QWidget* parent)
 	}
 
 	// Icon
-	this->setWindowIcon(QIcon{getStrataIconPath()});
+	this->setWindowIcon(QIcon{getSDKLauncherIconPath()});
 
 	// Config menu
 	auto* configMenu = this->menuBar()->addMenu(tr("Config"));
@@ -183,6 +184,14 @@ QString Window::getStrataIconPath() {
 	return ":/icons/strata_light.png";
 }
 
+QString Window::getSDKLauncherIconPath() {
+	if constexpr (PROJECT_DEFAULT_MOD == "p2ce") {
+		return ":/icons/p2ce_sdk.png";
+	} else {
+		return getStrataIconPath();
+	}
+}
+
 void Window::loadGameConfig(const QString& path) {
 	auto* layout = dynamic_cast<QVBoxLayout*>(this->main->layout());
 	::clearLayout(layout);
@@ -252,6 +261,9 @@ void Window::loadGameConfig(const QString& path) {
 
 	// Set ${STRATA_ICON}
 	gameConfig->setVariable("STRATA_ICON", getStrataIconPath());
+
+	// Set ${SDKLAUNCHER_ICON}
+	gameConfig->setVariable("SDKLAUNCHER_ICON", getSDKLauncherIconPath());
 
 	for (int i = 0; i < gameConfig->getSections().size(); i++) {
 		auto& section = gameConfig->getSections()[i];

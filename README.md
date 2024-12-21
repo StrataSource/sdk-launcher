@@ -53,12 +53,13 @@ Here is an example config file that may be loaded into the SDK launcher.
           // Arguments are optional for command-type actions, and will be passed
           // to the command when ran. ${GAME} expands to the game directory name.
           "arguments": ["-game", "${GAME}", "-dev"],
-          // The icon override (optional) allows the config creator to change the
-          // icon for any button. ${GAME_ICON} is a special keyword for steam-type
-          // configs which loads the game icon from Steam. ${STRATA_ICON} is a
-          // special keyword that picks the appropriate Strata icon based on the
-          // theme of the application. Filesystem paths are supported here.
-          "icon_override": "${GAME_ICON}",
+          // Optional, the icon override allows the config creator to change the
+          // default icon for any button. ${STRATA_ICON} is a special keyword that
+          // picks the appropriate Strata icon based on the theme of the application.
+          // ${SDKLAUNCHER_ICON} places the icon of the SDK Launcher application,
+          // and will fall back to the Strata icon if there is no custom icon for
+          // the current compiled game. Filesystem paths are supported here.
+          "icon_override": "${STRATA_ICON}",
           // Optional, allows buttons to only appear on a given OS. Allowed values
           // are "windows", "linux", or both in the same string like "windows,linux"
           // (although that's equivalent to not adding this value in the first place).

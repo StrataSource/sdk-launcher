@@ -20,6 +20,7 @@
 #include "GameConfig.h"
 #include "LaunchButton.h"
 #include "NewModDialog.h"
+#include "NewP2CEAddonDialog.h"
 
 #ifdef _WIN32
 #include <shlobj_core.h>
@@ -136,6 +137,11 @@ Window::Window(QWidget* parent)
 		NewModDialog::open(::getRootPath(this->configUsingLegacyBinDir), this->configModTemplateURL, this);
 	});
 
+	this->utilities_createNewAddon = utilitiesMenu->addAction(this->style()->standardIcon(QStyle::SP_FileIcon), tr("Create New Addon"), [this] {
+		QSettings settings;
+		NewP2CEAddonDialog::open(::getRootPath(this->configUsingLegacyBinDir) + QDir::separator() + settings.value(STR_GAME_OVERRIDE, {PROJECT_DEFAULT_MOD.data()}).toString(), this);
+	});
+
 	// Help menu
 	auto* helpMenu = this->menuBar()->addMenu(tr("Help"));
 
@@ -207,6 +213,7 @@ void Window::loadGameConfig(const QString& path) {
 	this->configUsingLegacyBinDir = gameConfig->getUsesLegacyBinDir();
 	this->configModTemplateURL = gameConfig->getModTemplateURL();
 	this->utilities_createNewMod->setDisabled(this->configModTemplateURL.isEmpty());
+	this->utilities_createNewAddon->setDisabled(!gameConfig->supportsP2CEAddons());
 
 	QSettings settings;
 	auto recentConfigs = settings.value(STR_RECENT_CONFIGS).value<QStringList>();

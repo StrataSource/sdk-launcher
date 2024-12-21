@@ -32,6 +32,8 @@ Here is an example config file that may be loaded into the SDK launcher.
   // Optional, holds the download URL of the mod template for the game (must point to a zip file)
   // For reference, this is the P2CE template mod download URL:
   "mod_template_url": "https://github.com/StrataSource/p2ce-mod-template/archive/refs/heads/main.zip",
+  // Optional, the default is false (enables P2CE-style addons)
+  "supports_p2ce_addons": false,
   // Sections hold titled groups of buttons
   "sections": [
     {

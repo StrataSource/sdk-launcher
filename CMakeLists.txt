@@ -142,6 +142,8 @@ add_executable(${PROJECT_TARGET_NAME} WIN32
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Main.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/NewModDialog.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/NewModDialog.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/NewP2CEAddonDialog.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/NewP2CEAddonDialog.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Window.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/Window.h")
 

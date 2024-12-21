@@ -74,6 +74,10 @@ std::optional<GameConfig> GameConfig::parse(const QString& path) {
 		gameConfig.modTemplateURL = configObject["mod_template_url"].toString();
 	}
 
+	if (configObject.contains("supports_p2ce_addons") && configObject["supports_p2ce_addons"].isBool()) {
+		gameConfig.p2ceAddonsSupported = configObject["supports_p2ce_addons"].toBool();
+	}
+
 	if (!configObject.contains("sections") || !configObject["sections"].isArray()) {
 		return std::nullopt;
 	}

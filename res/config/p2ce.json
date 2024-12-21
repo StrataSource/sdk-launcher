@@ -2,6 +2,7 @@
   "game_default": "p2ce",
   "window_height": 575,
   "mod_template_url": "https://github.com/StrataSource/p2ce-mod-template/archive/refs/heads/main.zip",
+  "supports_p2ce_addons": true,
   "sections": [
     {
       "name": "Game",

@@ -84,8 +84,7 @@ NewP2CEAddonDialog::NewP2CEAddonDialog(QString gameRoot_, QWidget* parent)
 		QFile addonKV3{this->getAddonInstallDir() + QDir::separator() + "addon.kv3"};
 		addonKV3.open(QIODevice::WriteOnly | QIODevice::Text);
 
-		static constexpr auto p2ceAddonKV3ContentsBase = R"(<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
-{
+		static constexpr auto p2ceAddonKV3ContentsBase = R"({
 	mod = "%1"
 	description = "%2"
 	type = "%3"

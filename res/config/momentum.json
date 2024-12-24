@@ -58,8 +58,14 @@
         {
           "name": "Momentum Mod Wiki",
           "type": "link",
-          "action": "https://wiki.stratasource.org/momentum",
+          "action": "https://docs.momentum-mod.org",
           "icon_override": "${GAME_ICON}"
+        },
+        {
+          "name": "Strata Wiki",
+          "type": "link",
+          "action": "https://wiki.stratasource.org",
+          "icon_override": "${STRATA_ICON}"
         },
         {
           "name": "Momentum Mod Issue Tracker",

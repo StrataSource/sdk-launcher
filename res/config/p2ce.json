@@ -1,6 +1,6 @@
 {
   "game_default": "p2ce",
-  "window_height": 600,
+  "window_height": 625,
   "mod_template_url": "https://github.com/StrataSource/p2ce-mod-template/archive/refs/heads/main.zip",
   "supports_p2ce_addons": true,
   "sections": [
@@ -75,10 +75,10 @@
       "name": "Links",
       "entries": [
         {
-          "name": "Portal 2: CE Wiki",
+          "name": "Strata Wiki",
           "type": "link",
-          "action": "https://wiki.stratasource.org/p2ce",
-          "icon_override": "${GAME_ICON}"
+          "action": "https://wiki.stratasource.org",
+          "icon_override": "${STRATA_ICON}"
         },
         {
           "name": "Portal 2: CE Issue Tracker",
@@ -97,6 +97,11 @@
     {
       "name": "Quick Access",
       "entries": [
+        {
+          "name": "Addons Folder",
+          "type": "directory",
+          "action": "${ROOT}/p2ce/addons"
+        },
         {
           "name": "Custom Folder",
           "type": "directory",

@@ -67,7 +67,7 @@
           "name": "Workshop Uploader",
           "type": "command",
           "action": "${ROOT}/bin/${PLATFORM}/workshopgui",
-          "arguments": ["-game", "${GAME}"]
+          "arguments": ["-game", "${GAME}", "-workshopid", "440000"]
         }
       ]
     },

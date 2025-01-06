@@ -86,7 +86,9 @@ NewP2CEAddonDialog::NewP2CEAddonDialog(QString gameRoot_, QWidget* parent)
 
 		static constexpr auto p2ceAddonKV3ContentsBase = R"({
 	mod = "%1"
-	description = "%2"
+	description = """
+%2
+"""
 	type = "%3"
 	id = 0
 	thumbnail = ""

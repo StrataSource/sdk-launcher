@@ -1,6 +1,6 @@
 {
   "game_default": "p2ce",
-  "window_height": 625,
+  "window_height": 647,
   "mod_template_url": "https://github.com/StrataSource/p2ce-mod-template/archive/refs/heads/main.zip",
   "supports_p2ce_addons": true,
   "sections": [
@@ -116,6 +116,11 @@
           "name": "SDK Tools",
           "type": "directory",
           "action": "${ROOT}/sdk_tools"
+        },
+        {
+          "name": "Steam SourceMods",
+          "type": "directory",
+          "action": "${SOURCEMODS}"
         }
       ]
     }

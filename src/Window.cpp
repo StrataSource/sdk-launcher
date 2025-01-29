@@ -21,6 +21,7 @@
 #include "LaunchButton.h"
 #include "NewModDialog.h"
 #include "NewP2CEAddonDialog.h"
+#include "Steam.h"
 
 #ifdef _WIN32
 #include <shlobj_core.h>
@@ -226,6 +227,9 @@ void Window::loadGameConfig(const QString& path) {
 	}
 	settings.setValue(STR_RECENT_CONFIGS, recentConfigs);
 	this->regenerateRecentConfigs();
+
+	// Set ${SOURCEMODS}
+	gameConfig->setVariable("SOURCEMODS", ::getSourceModsDir());
 
 	// Set ${ROOT}
 	const auto rootPath = ::getRootPath(this->configUsingLegacyBinDir);

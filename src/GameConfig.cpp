@@ -148,6 +148,7 @@ void GameConfig::setVariable(const QString& variable, const QString& replacement
 	const auto setVar = [&variable, &replacement](QString& str) {
 		str.replace(QString("${%1}").arg(variable), replacement);
 	};
+	setVar(this->gameDefault);
 	setVar(this->gameIcon);
 	for (auto& section : this->sections) {
 		setVar(section.name);

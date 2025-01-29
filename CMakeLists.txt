@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 # Create project
 project(sdk_launcher
         DESCRIPTION "An SDK launcher for Strata Source engine games"
-        VERSION "0.5.3"
+        VERSION "0.6.0"
         HOMEPAGE_URL "https://github.com/StrataSource/sdk-launcher")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

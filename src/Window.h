@@ -20,13 +20,14 @@ public:
 	void regenerateRecentConfigs();
 
 private:
+	QString gameDefault;
 	bool configUsingLegacyBinDir;
 	QString configModTemplateURL;
 
 	QMenu* recent;
 	QAction* config_loadDefault;
-	QAction* game_resetToDefault;
 	QAction* game_overrideGame;
+	QAction* game_resetToDefault;
 	QAction* utilities_createNewMod;
 	QAction* utilities_createNewAddon;
 

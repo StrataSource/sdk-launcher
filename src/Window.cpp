@@ -76,15 +76,10 @@ constexpr std::string_view STR_GAME_OVERRIDE = "str_game_override";
 
 Window::Window(QWidget* parent)
 		: QMainWindow(parent)
+		, gameDefault(PROJECT_DEFAULT_MOD.data())
 		, configUsingLegacyBinDir(false) {
 	this->setWindowTitle(PROJECT_NAME.data());
 	this->setMinimumHeight(400);
-
-	// Default settings (recent configs are set later on)
-	QSettings settings;
-	if (!settings.contains(STR_GAME_OVERRIDE)) {
-		settings.setValue(STR_GAME_OVERRIDE, QString(PROJECT_DEFAULT_MOD.data()));
-	}
 
 	// Icon
 	this->setWindowIcon(QIcon{getSDKLauncherIconPath()});
@@ -111,24 +106,20 @@ Window::Window(QWidget* parent)
 	// Game menu
 	auto* gameMenu = this->menuBar()->addMenu(tr("Game"));
 
-	this->game_resetToDefault = gameMenu->addAction(tr("Reset to Default"), [this] {
-		QSettings settings;
-		settings.setValue(STR_GAME_OVERRIDE, QString(PROJECT_DEFAULT_MOD.data()));
-		this->game_overrideGame->setText(tr("Override \"%1\" Folder").arg(settings.value(STR_GAME_OVERRIDE).toString()));
-		this->loadGameConfig(settings.value(STR_RECENT_CONFIGS).toStringList().first());
-	});
-
-	gameMenu->addSeparator();
-
-	this->game_overrideGame = gameMenu->addAction(tr("Override \"%1\" Folder").arg(settings.value(STR_GAME_OVERRIDE).toString()), [this] {
+	this->game_overrideGame = gameMenu->addAction(tr("Override Game Folder"), [this] {
 		const auto rootPath = ::getRootPath(this->configUsingLegacyBinDir);
 		if (auto path = QFileDialog::getExistingDirectory(this, tr("Override Game Folder"), rootPath); !path.isEmpty()) {
 			const QDir rootDir{rootPath};
 			QSettings settings;
 			settings.setValue(STR_GAME_OVERRIDE, QDir::cleanPath(rootDir.relativeFilePath(path)));
-			this->game_overrideGame->setText(tr("Override \"%1\" Folder").arg(settings.value(STR_GAME_OVERRIDE).toString()));
 			this->loadGameConfig(settings.value(STR_RECENT_CONFIGS).toStringList().first());
 		}
+	});
+
+	this->game_resetToDefault = gameMenu->addAction(tr("Reset to Default"), [this] {
+		QSettings settings;
+		settings.remove(STR_GAME_OVERRIDE);
+		this->loadGameConfig(settings.value(STR_RECENT_CONFIGS).toStringList().first());
 	});
 
 	// Utilities menu
@@ -139,8 +130,16 @@ Window::Window(QWidget* parent)
 	});
 
 	this->utilities_createNewAddon = utilitiesMenu->addAction(this->style()->standardIcon(QStyle::SP_FileIcon), tr("Create New Addon"), [this] {
-		QSettings settings;
-		NewP2CEAddonDialog::open(::getRootPath(this->configUsingLegacyBinDir) + QDir::separator() + settings.value(STR_GAME_OVERRIDE, {PROJECT_DEFAULT_MOD.data()}).toString(), this);
+		QString gameRoot;
+		if (QSettings settings; settings.contains(STR_GAME_OVERRIDE)) {
+			gameRoot = settings.value(STR_GAME_OVERRIDE).toString();
+		} else {
+			gameRoot = this->gameDefault;
+		}
+		if (!QDir::isAbsolutePath(gameRoot)) {
+			gameRoot = ::getRootPath(this->configUsingLegacyBinDir) + QDir::separator() + gameRoot;
+		}
+		NewP2CEAddonDialog::open(gameRoot, this);
 	});
 
 	// Help menu
@@ -172,7 +171,7 @@ Window::Window(QWidget* parent)
 
 	new QVBoxLayout(this->main);
 
-	if (!settings.contains(STR_RECENT_CONFIGS)) {
+	if (QSettings settings; !settings.contains(STR_RECENT_CONFIGS)) {
 		settings.setValue(STR_RECENT_CONFIGS, QStringList{});
 		if (auto defaultConfigPath = QCoreApplication::applicationDirPath() + "/SDKLauncherDefault.json"; QFile::exists(defaultConfigPath)) {
 			this->loadGameConfig(defaultConfigPath);
@@ -246,9 +245,18 @@ void Window::loadGameConfig(const QString& path) {
 	#warning "Unknown platform! ${PLATFORM} will not be substituted!"
 #endif
 
+	// Set ${STRATA_ICON}
+	gameConfig->setVariable("STRATA_ICON", getStrataIconPath());
+
+	// Set ${SDKLAUNCHER_ICON}
+	gameConfig->setVariable("SDKLAUNCHER_ICON", getSDKLauncherIconPath());
+
+	// Get default game
+	this->gameDefault = gameConfig->getGameDefault();
+
 	// tiny hack: get default game icon before ${GAME} substitution
 	QString defaultGameIconPath = gameConfig->getGameIcon();
-	defaultGameIconPath.replace("${GAME}", PROJECT_DEFAULT_MOD.data());
+	defaultGameIconPath.replace("${GAME}", this->gameDefault);
 	if (QIcon defaultGameIcon{defaultGameIconPath}; !defaultGameIcon.isNull() && !defaultGameIcon.availableSizes().isEmpty()) {
 		this->config_loadDefault->setIcon(defaultGameIcon);
 		this->game_resetToDefault->setIcon(defaultGameIcon);
@@ -258,7 +266,7 @@ void Window::loadGameConfig(const QString& path) {
 	}
 
 	// Set ${GAME}
-	QString gameDir = settings.contains(STR_GAME_OVERRIDE) ? settings.value(STR_GAME_OVERRIDE).toString() : gameConfig->getGameDefault();
+	QString gameDir = settings.contains(STR_GAME_OVERRIDE) ? settings.value(STR_GAME_OVERRIDE).toString() : this->gameDefault;
 	gameConfig->setVariable("GAME", gameDir);
 
 	// Set ${GAME_ICON}
@@ -269,12 +277,6 @@ void Window::loadGameConfig(const QString& path) {
 		this->game_overrideGame->setIcon(this->style()->standardIcon(QStyle::SP_FileLinkIcon));
 		gameConfig->setVariable("GAME_ICON", "");
 	}
-
-	// Set ${STRATA_ICON}
-	gameConfig->setVariable("STRATA_ICON", getStrataIconPath());
-
-	// Set ${SDKLAUNCHER_ICON}
-	gameConfig->setVariable("SDKLAUNCHER_ICON", getSDKLauncherIconPath());
 
 	for (int i = 0; i < gameConfig->getSections().size(); i++) {
 		auto& section = gameConfig->getSections()[i];

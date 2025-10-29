@@ -7,21 +7,21 @@
         {
           "name": "Momentum Mod - Dev Mode",
           "type": "command",
-          "action": "${ROOT}/bin/${PLATFORM}/chaos",
+          "action": "${ROOT}/bin/${PLATFORM}/momentum",
           "arguments": ["-game", "${GAME}", "-dev", "-console"],
           "icon_override": "${GAME_ICON}"
         },
         {
           "name": "Momentum Mod - Dev && Tools Mode",
           "type": "command",
-          "action": "${ROOT}/bin/${PLATFORM}/chaos",
+          "action": "${ROOT}/bin/${PLATFORM}/momentum",
           "arguments": ["-game", "${GAME}", "-dev", "-console", "-tools"],
           "icon_override": "${GAME_ICON}"
         },
         {
           "name": "Momentum Mod - Safe Mode (No Custom Content)",
           "type": "command",
-          "action": "${ROOT}/bin/${PLATFORM}/chaos",
+          "action": "${ROOT}/bin/${PLATFORM}/momentum",
           "arguments": ["-game", "${GAME}", "-nousermount", "-nocustommount"],
           "icon_override": "${GAME_ICON}"
         }

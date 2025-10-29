@@ -10,21 +10,21 @@
         {
           "name": "Portal 2: CE - Dev Mode",
           "type": "command",
-          "action": "${ROOT}/bin/${PLATFORM}/chaos",
+          "action": "${ROOT}/bin/${PLATFORM}/p2ce",
           "arguments": ["-game", "${GAME}", "-dev", "-console"],
           "icon_override": "${GAME_ICON}"
         },
         {
           "name": "Portal 2: CE - Dev && Tools Mode",
           "type": "command",
-          "action": "${ROOT}/bin/${PLATFORM}/chaos",
+          "action": "${ROOT}/bin/${PLATFORM}/p2ce",
           "arguments": ["-game", "${GAME}", "-dev", "-console", "-tools"],
           "icon_override": "${GAME_ICON}"
         },
         {
           "name": "Portal 2: CE - Safe Mode",
           "type": "command",
-          "action": "${ROOT}/bin/${PLATFORM}/chaos",
+          "action": "${ROOT}/bin/${PLATFORM}/p2ce",
           "arguments": ["-game", "${GAME}", "-nousermount", "-nocustommount"],
           "icon_override": "${GAME_ICON}"
         }

@@ -93,7 +93,7 @@ Window::Window(QWidget* parent)
 	auto* configMenu = this->menuBar()->addMenu(tr("Config"));
 
 	this->config_loadDefault = configMenu->addAction("Load Default", Qt::CTRL | Qt::Key_R, [this] {
-		this->loadGameConfig(QString(":/config/%1.json").arg(PROJECT_DEFAULT_MOD.data()));
+		this->loadDefaultGameConfig();
 	});
 
 	configMenu->addSeparator();
@@ -175,11 +175,7 @@ Window::Window(QWidget* parent)
 
 	if (!::settings().contains(STR_RECENT_CONFIGS) || ::settings().value(STR_RECENT_CONFIGS).value<QStringList>().empty()) {
 		::settings().setValue(STR_RECENT_CONFIGS, QStringList{});
-		if (const auto defaultConfigPath = QCoreApplication::applicationDirPath() + "/SDKLauncherDefault.json"; QFile::exists(defaultConfigPath)) {
-			this->loadGameConfig(defaultConfigPath);
-		} else {
-			this->loadGameConfig(QString(":/config/%1.json").arg(PROJECT_DEFAULT_MOD.data()));
-		}
+
 	} else {
 		this->loadGameConfig(::settings().value(STR_RECENT_CONFIGS).value<QStringList>().first());
 	}
@@ -197,6 +193,14 @@ QString Window::getSDKLauncherIconPath() {
 		return ":/icons/p2ce_sdk.png";
 	} else {
 		return getStrataIconPath();
+	}
+}
+
+void Window::loadDefaultGameConfig() {
+	if (const auto defaultConfigPath = QCoreApplication::applicationDirPath() + "/SDKLauncherDefault.json"; QFile::exists(defaultConfigPath)) {
+		this->loadGameConfig(defaultConfigPath);
+	} else {
+		this->loadGameConfig(QString(":/config/%1.json").arg(PROJECT_DEFAULT_MOD.data()));
 	}
 }
 

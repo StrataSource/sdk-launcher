@@ -15,6 +15,8 @@ public:
 
 	[[nodiscard]] static QString getSDKLauncherIconPath();
 
+	void loadDefaultGameConfig();
+
 	void loadGameConfig(const QString& path);
 
 	void regenerateRecentConfigs();

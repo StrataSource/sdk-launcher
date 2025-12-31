@@ -25,7 +25,7 @@ jobs:
         shell: cmd
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
 
@@ -36,7 +36,7 @@ jobs:
           spectre: true
 
       - name: Install Qt
-        uses: jurplel/install-qt-action@v3
+        uses: jurplel/install-qt-action@v4
         with:
           aqtversion: '==3.1.*'
           version: ${{env.QT_VERSION}}
@@ -56,7 +56,7 @@ jobs:
           cmake --build . --config ${{matrix.build_type}} -t SDKLauncher -- -j%NUMBER_OF_PROCESSORS%
 
       - name: Upload SDK Launcher
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: 'SDKLauncher-${{matrix.target}}-Windows-${{matrix.compiler}}-${{matrix.build_type}}'
           path: ${{env.BUILD_DIR}}/SDKLauncher.exe
@@ -71,7 +71,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
 
@@ -80,13 +80,13 @@ jobs:
 
       - name: Install GCC [compiler:gcc]
         if: ${{matrix.compiler == 'gcc'}}
-        uses: egor-tensin/setup-gcc@v1
+        uses: egor-tensin/setup-gcc@v2
         with:
           version: 11
           platform: x64
 
       - name: Install Qt
-        uses: jurplel/install-qt-action@v3
+        uses: jurplel/install-qt-action@v4
         with:
           aqtversion: '==3.1.*'
           version: ${{env.QT_VERSION}}
@@ -105,7 +105,7 @@ jobs:
         run: cmake --build . --config ${{matrix.build_type}} -t SDKLauncher -- -j$(nproc)
 
       - name: Upload SDK Launcher
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: 'SDKLauncher-${{matrix.target}}-Linux-${{matrix.compiler}}-${{matrix.build_type}}'
           path: ${{env.BUILD_DIR}}/SDKLauncher
@@ -118,7 +118,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Artifacts
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const artifacts = (await github.rest.actions.listWorkflowRunArtifacts({
@@ -142,7 +142,7 @@ jobs:
             console.log("Artifact download complete!");
 
       - name: Upload Release
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Release-Artifacts
           path: |

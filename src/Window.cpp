@@ -171,7 +171,8 @@ Window::Window(QWidget* parent)
 
 	new QVBoxLayout(this->main);
 
-	if (QSettings settings; !settings.contains(STR_RECENT_CONFIGS)) {
+	QSettings settings;
+	if (!settings.contains(STR_RECENT_CONFIGS) || settings.value(STR_RECENT_CONFIGS).value<QStringList>().empty()) {
 		settings.setValue(STR_RECENT_CONFIGS, QStringList{});
 		if (auto defaultConfigPath = QCoreApplication::applicationDirPath() + "/SDKLauncherDefault.json"; QFile::exists(defaultConfigPath)) {
 			this->loadGameConfig(defaultConfigPath);
@@ -412,7 +413,7 @@ void Window::regenerateRecentConfigs() {
 	}
 	this->recent->addSeparator();
 	this->recent->addAction(tr("Clear"), [this] {
-		QSettings().setValue(STR_RECENT_CONFIGS, QStringList{});
+		QSettings().remove(STR_RECENT_CONFIGS);
 		this->regenerateRecentConfigs();
 	});
 }

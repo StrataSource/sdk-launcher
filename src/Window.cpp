@@ -69,6 +69,11 @@ void clearLayout(QLayout* layout, bool deleteWidgets = true) {
 	return rootPath;
 }
 
+[[nodiscard]] QSettings& settings() {
+	static QSettings s{QString{"%1.ini"}.arg(PROJECT_TARGET_NAME.data()), QSettings::Format::IniFormat};
+	return s;
+}
+
 constexpr std::string_view STR_RECENT_CONFIGS = "str_recent_configs";
 constexpr std::string_view STR_GAME_OVERRIDE = "str_game_override";
 
@@ -109,16 +114,14 @@ Window::Window(QWidget* parent)
 		const auto rootPath = ::getRootPath(this->configUsingLegacyBinDir);
 		if (const auto path = QFileDialog::getExistingDirectory(this, tr("Override Game Folder"), rootPath); !path.isEmpty()) {
 			const QDir rootDir{rootPath};
-			QSettings settings;
-			settings.setValue(STR_GAME_OVERRIDE, QDir::cleanPath(rootDir.relativeFilePath(path)));
-			this->loadGameConfig(settings.value(STR_RECENT_CONFIGS).toStringList().first());
+			::settings().setValue(STR_GAME_OVERRIDE, QDir::cleanPath(rootDir.relativeFilePath(path)));
+			this->loadGameConfig(::settings().value(STR_RECENT_CONFIGS).toStringList().first());
 		}
 	});
 
 	this->game_resetToDefault = gameMenu->addAction(tr("Reset to Default"), [this] {
-		QSettings settings;
-		settings.remove(STR_GAME_OVERRIDE);
-		this->loadGameConfig(settings.value(STR_RECENT_CONFIGS).toStringList().first());
+		::settings().remove(STR_GAME_OVERRIDE);
+		this->loadGameConfig(::settings().value(STR_RECENT_CONFIGS).toStringList().first());
 	});
 
 	// Utilities menu
@@ -130,8 +133,8 @@ Window::Window(QWidget* parent)
 
 	this->utilities_createNewAddon = utilitiesMenu->addAction(this->style()->standardIcon(QStyle::SP_FileIcon), tr("Create New Addon"), [this] {
 		QString gameRoot;
-		if (const QSettings settings; settings.contains(STR_GAME_OVERRIDE)) {
-			gameRoot = settings.value(STR_GAME_OVERRIDE).toString();
+		if (::settings().contains(STR_GAME_OVERRIDE)) {
+			gameRoot = ::settings().value(STR_GAME_OVERRIDE).toString();
 		} else {
 			gameRoot = this->gameDefault;
 		}
@@ -170,15 +173,15 @@ Window::Window(QWidget* parent)
 
 	new QVBoxLayout(this->main);
 
-	if (QSettings settings; !settings.contains(STR_RECENT_CONFIGS) || settings.value(STR_RECENT_CONFIGS).value<QStringList>().empty()) {
-		settings.setValue(STR_RECENT_CONFIGS, QStringList{});
+	if (!::settings().contains(STR_RECENT_CONFIGS) || ::settings().value(STR_RECENT_CONFIGS).value<QStringList>().empty()) {
+		::settings().setValue(STR_RECENT_CONFIGS, QStringList{});
 		if (const auto defaultConfigPath = QCoreApplication::applicationDirPath() + "/SDKLauncherDefault.json"; QFile::exists(defaultConfigPath)) {
 			this->loadGameConfig(defaultConfigPath);
 		} else {
 			this->loadGameConfig(QString(":/config/%1.json").arg(PROJECT_DEFAULT_MOD.data()));
 		}
 	} else {
-		this->loadGameConfig(settings.value(STR_RECENT_CONFIGS).value<QStringList>().first());
+		this->loadGameConfig(::settings().value(STR_RECENT_CONFIGS).value<QStringList>().first());
 	}
 }
 
@@ -214,8 +217,7 @@ void Window::loadGameConfig(const QString& path) {
 	this->utilities_createNewMod->setDisabled(this->configModTemplateURL.isEmpty());
 	this->utilities_createNewAddon->setDisabled(!gameConfig->supportsP2CEAddons());
 
-	QSettings settings;
-	auto recentConfigs = settings.value(STR_RECENT_CONFIGS).value<QStringList>();
+	auto recentConfigs = ::settings().value(STR_RECENT_CONFIGS).value<QStringList>();
 	if (recentConfigs.contains(path)) {
 		recentConfigs.removeAt(recentConfigs.indexOf(path));
 	}
@@ -223,7 +225,7 @@ void Window::loadGameConfig(const QString& path) {
 	if (recentConfigs.size() > 10) {
 		recentConfigs.pop_back();
 	}
-	settings.setValue(STR_RECENT_CONFIGS, recentConfigs);
+	::settings().setValue(STR_RECENT_CONFIGS, recentConfigs);
 	this->regenerateRecentConfigs();
 
 	// Set ${SOURCEMODS}
@@ -265,7 +267,7 @@ void Window::loadGameConfig(const QString& path) {
 	}
 
 	// Set ${GAME}
-	const QString gameDir = settings.contains(STR_GAME_OVERRIDE) ? settings.value(STR_GAME_OVERRIDE).toString() : this->gameDefault;
+	const QString gameDir = ::settings().contains(STR_GAME_OVERRIDE) ? ::settings().value(STR_GAME_OVERRIDE).toString() : this->gameDefault;
 	gameConfig->setVariable("GAME", gameDir);
 
 	// Set ${GAME_ICON}
@@ -397,7 +399,7 @@ void Window::loadGameConfig(const QString& path) {
 void Window::regenerateRecentConfigs() {
 	this->recent->clear();
 
-	auto paths = QSettings().value(STR_RECENT_CONFIGS).value<QStringList>();
+	auto paths = ::settings().value(STR_RECENT_CONFIGS).value<QStringList>();
 	if (paths.empty()) {
 		auto* noRecentFilesAction = this->recent->addAction(tr("No recent files."));
 		noRecentFilesAction->setDisabled(true);
@@ -410,7 +412,7 @@ void Window::regenerateRecentConfigs() {
 	}
 	this->recent->addSeparator();
 	this->recent->addAction(tr("Clear"), [this] {
-		QSettings().remove(STR_RECENT_CONFIGS);
+		::settings().remove(STR_RECENT_CONFIGS);
 		this->regenerateRecentConfigs();
 	});
 }

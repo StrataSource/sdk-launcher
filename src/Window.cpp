@@ -11,7 +11,6 @@
 #include <QMessageBox>
 #include <QProcess>
 #include <QScrollArea>
-#include <QSettings>
 #include <QStyle>
 #include <QStyleHints>
 #include <QVBoxLayout>
@@ -21,6 +20,7 @@
 #include "LaunchButton.h"
 #include "NewModDialog.h"
 #include "NewP2CEAddonDialog.h"
+#include "Options.h"
 #include "Steam.h"
 
 #ifdef _WIN32
@@ -69,14 +69,6 @@ void clearLayout(QLayout* layout, bool deleteWidgets = true) {
 	return rootPath;
 }
 
-[[nodiscard]] QSettings& settings() {
-	static QSettings s{QString{"%1.ini"}.arg(PROJECT_TARGET_NAME.data()), QSettings::Format::IniFormat};
-	return s;
-}
-
-constexpr std::string_view STR_RECENT_CONFIGS = "str_recent_configs";
-constexpr std::string_view STR_GAME_OVERRIDE = "str_game_override";
-
 } // namespace
 
 Window::Window(QWidget* parent)
@@ -107,6 +99,14 @@ Window::Window(QWidget* parent)
 	this->recent = configMenu->addMenu(this->style()->standardIcon(QStyle::SP_FileDialogDetailedView), tr("Load Recent..."));
 	// Will be regenerated naturally later on
 
+	configMenu->addSeparator();
+
+	auto* singleClickToRunAction = configMenu->addAction(tr("Single-Click to Run"), [] {
+		::options().setValue(BOOL_SINGLE_CLICK_TO_RUN, !::options().value(BOOL_SINGLE_CLICK_TO_RUN, BOOL_SINGLE_CLICK_TO_RUN_DEFAULT).toBool());
+	});
+	singleClickToRunAction->setCheckable(true);
+	singleClickToRunAction->setChecked(::options().value(BOOL_SINGLE_CLICK_TO_RUN, BOOL_SINGLE_CLICK_TO_RUN_DEFAULT).toBool());
+
 	// Game menu
 	auto* gameMenu = this->menuBar()->addMenu(tr("Game"));
 
@@ -114,14 +114,14 @@ Window::Window(QWidget* parent)
 		const auto rootPath = ::getRootPath(this->configUsingLegacyBinDir);
 		if (const auto path = QFileDialog::getExistingDirectory(this, tr("Override Game Folder"), rootPath); !path.isEmpty()) {
 			const QDir rootDir{rootPath};
-			::settings().setValue(STR_GAME_OVERRIDE, QDir::cleanPath(rootDir.relativeFilePath(path)));
-			this->loadGameConfig(::settings().value(STR_RECENT_CONFIGS).toStringList().first());
+			::options().setValue(STR_GAME_OVERRIDE, QDir::cleanPath(rootDir.relativeFilePath(path)));
+			this->loadGameConfig(::options().value(STR_RECENT_CONFIGS).toStringList().first());
 		}
 	});
 
 	this->game_resetToDefault = gameMenu->addAction(tr("Reset to Default"), [this] {
-		::settings().remove(STR_GAME_OVERRIDE);
-		this->loadGameConfig(::settings().value(STR_RECENT_CONFIGS).toStringList().first());
+		::options().remove(STR_GAME_OVERRIDE);
+		this->loadGameConfig(::options().value(STR_RECENT_CONFIGS).toStringList().first());
 	});
 
 	// Utilities menu
@@ -133,8 +133,8 @@ Window::Window(QWidget* parent)
 
 	this->utilities_createNewAddon = utilitiesMenu->addAction(this->style()->standardIcon(QStyle::SP_FileIcon), tr("Create New Addon"), [this] {
 		QString gameRoot;
-		if (::settings().contains(STR_GAME_OVERRIDE)) {
-			gameRoot = ::settings().value(STR_GAME_OVERRIDE).toString();
+		if (::options().contains(STR_GAME_OVERRIDE)) {
+			gameRoot = ::options().value(STR_GAME_OVERRIDE).toString();
 		} else {
 			gameRoot = this->gameDefault;
 		}
@@ -173,11 +173,11 @@ Window::Window(QWidget* parent)
 
 	new QVBoxLayout(this->main);
 
-	if (!::settings().contains(STR_RECENT_CONFIGS) || ::settings().value(STR_RECENT_CONFIGS).value<QStringList>().empty()) {
-		::settings().setValue(STR_RECENT_CONFIGS, QStringList{});
+	if (!::options().contains(STR_RECENT_CONFIGS) || ::options().value(STR_RECENT_CONFIGS).value<QStringList>().empty()) {
+		::options().setValue(STR_RECENT_CONFIGS, QStringList{});
 
 	} else {
-		this->loadGameConfig(::settings().value(STR_RECENT_CONFIGS).value<QStringList>().first());
+		this->loadGameConfig(::options().value(STR_RECENT_CONFIGS).value<QStringList>().first());
 	}
 }
 
@@ -221,7 +221,7 @@ void Window::loadGameConfig(const QString& path) {
 	this->utilities_createNewMod->setDisabled(this->configModTemplateURL.isEmpty());
 	this->utilities_createNewAddon->setDisabled(!gameConfig->supportsP2CEAddons());
 
-	auto recentConfigs = ::settings().value(STR_RECENT_CONFIGS).value<QStringList>();
+	auto recentConfigs = ::options().value(STR_RECENT_CONFIGS).value<QStringList>();
 	if (recentConfigs.contains(path)) {
 		recentConfigs.removeAt(recentConfigs.indexOf(path));
 	}
@@ -229,7 +229,7 @@ void Window::loadGameConfig(const QString& path) {
 	if (recentConfigs.size() > 10) {
 		recentConfigs.pop_back();
 	}
-	::settings().setValue(STR_RECENT_CONFIGS, recentConfigs);
+	::options().setValue(STR_RECENT_CONFIGS, recentConfigs);
 	this->regenerateRecentConfigs();
 
 	// Set ${SOURCEMODS}
@@ -271,7 +271,7 @@ void Window::loadGameConfig(const QString& path) {
 	}
 
 	// Set ${GAME}
-	const QString gameDir = ::settings().contains(STR_GAME_OVERRIDE) ? ::settings().value(STR_GAME_OVERRIDE).toString() : this->gameDefault;
+	const QString gameDir = ::options().contains(STR_GAME_OVERRIDE) ? ::options().value(STR_GAME_OVERRIDE).toString() : this->gameDefault;
 	gameConfig->setVariable("GAME", gameDir);
 
 	// Set ${GAME_ICON}
@@ -334,7 +334,7 @@ void Window::loadGameConfig(const QString& path) {
 #endif
 					}
 					button->setToolTip(action + " " + entry.arguments.join(" "));
-					QObject::connect(button, &LaunchButton::doubleClicked, this, [this, action, args=entry.arguments, cwd=rootPath] {
+					QObject::connect(button, &LaunchButton::launch, this, [this, action, args=entry.arguments, cwd=rootPath] {
 						auto* process = new QProcess;
 						QObject::connect(process, &QProcess::errorOccurred, this, [this, timeStart = std::chrono::steady_clock::now()](QProcess::ProcessError code) {
 							QString error;
@@ -372,7 +372,7 @@ void Window::loadGameConfig(const QString& path) {
 						button->setIcon(this->style()->standardIcon(QStyle::SP_MessageBoxInformation));
 					}
 					button->setToolTip(action);
-					QObject::connect(button, &LaunchButton::doubleClicked, this, [action] {
+					QObject::connect(button, &LaunchButton::launch, this, [action] {
 						QDesktopServices::openUrl({action});
 					});
 					break;
@@ -381,7 +381,7 @@ void Window::loadGameConfig(const QString& path) {
 						button->setIcon(this->style()->standardIcon(QStyle::SP_DirLinkIcon));
 					}
 					button->setToolTip(action);
-					QObject::connect(button, &LaunchButton::doubleClicked, this, [action] {
+					QObject::connect(button, &LaunchButton::launch, this, [action] {
 						QDesktopServices::openUrl({QString("file:///") + action});
 					});
 					break;
@@ -403,7 +403,7 @@ void Window::loadGameConfig(const QString& path) {
 void Window::regenerateRecentConfigs() {
 	this->recent->clear();
 
-	auto paths = ::settings().value(STR_RECENT_CONFIGS).value<QStringList>();
+	auto paths = ::options().value(STR_RECENT_CONFIGS).value<QStringList>();
 	if (paths.empty()) {
 		auto* noRecentFilesAction = this->recent->addAction(tr("No recent files."));
 		noRecentFilesAction->setDisabled(true);
@@ -416,7 +416,7 @@ void Window::regenerateRecentConfigs() {
 	}
 	this->recent->addSeparator();
 	this->recent->addAction(tr("Clear"), [this] {
-		::settings().remove(STR_RECENT_CONFIGS);
+		::options().remove(STR_RECENT_CONFIGS);
 		this->regenerateRecentConfigs();
 	});
 }

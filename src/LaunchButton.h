@@ -8,14 +8,11 @@ class LaunchButton : public QToolButton {
 	Q_OBJECT;
 
 public:
-	using QToolButton::QToolButton;
+	explicit LaunchButton(QWidget* parent = nullptr);
 
 protected:
-	// Actually incredible Qt doesn't expose this already
-	void mouseDoubleClickEvent(QMouseEvent*) override {
-		emit this->doubleClicked();
-	}
+	void mouseDoubleClickEvent(QMouseEvent* event) override;
 
 signals:
-	void doubleClicked();
+	void launch();
 };

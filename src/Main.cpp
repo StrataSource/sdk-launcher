@@ -5,7 +5,7 @@
 #include "Window.h"
 
 int main(int argc, char** argv) {
-	QCoreApplication::setOrganizationName("Strata Source");
+	QCoreApplication::setOrganizationName(PROJECT_ORGANIZATION.data());
 	QCoreApplication::setApplicationName(PROJECT_NAME.data());
 	QCoreApplication::setApplicationVersion(PROJECT_VERSION.data());
 

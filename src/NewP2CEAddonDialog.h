@@ -11,7 +11,7 @@ class NewP2CEAddonDialog : public QDialog {
 	Q_OBJECT;
 
 public:
-	NewP2CEAddonDialog(QString gameRoot_, QWidget* parent = nullptr);
+	explicit NewP2CEAddonDialog(QString gameRoot_, QWidget* parent = nullptr);
 
 	[[nodiscard]] QString getAddonInstallDir() const;
 

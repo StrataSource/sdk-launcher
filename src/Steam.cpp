@@ -36,7 +36,7 @@ namespace {
 	}
 #else
 	{
-		std::filesystem::path home{std::getenv("HOME")};
+		const std::filesystem::path home{std::getenv("HOME")};
 #ifdef __APPLE__
 		steamLocation = home / "Library" / "Application Support" / "Steam";
 #else
@@ -52,7 +52,7 @@ namespace {
 
 	if (!std::filesystem::exists(steamLocation, ec)) {
 		std::string location;
-		std::filesystem::path d{"cwd/steamclient64.dll"};
+		const std::filesystem::path d{"cwd/steamclient64.dll"};
 		for (const auto& entry : std::filesystem::directory_iterator{"/proc/"}) {
 			if (std::filesystem::exists(entry / d, ec)) {
 				ec.clear();
@@ -66,13 +66,12 @@ namespace {
 		}
 		if (location.empty()) {
 			return "";
-		} else {
-			steamLocation = location;
 		}
+		steamLocation = location;
 	}
 #endif
 
-	if (auto sourceModPath = (steamLocation / "steamapps" / "sourcemods").string(); std::filesystem::exists(sourceModPath, ec)) {
+	if (const auto sourceModPath = (steamLocation / "steamapps" / "sourcemods").string(); std::filesystem::exists(sourceModPath, ec)) {
 		return sourceModPath.c_str();
 	}
 	return "";

@@ -382,7 +382,7 @@ void Window::loadGameConfig(const QString& path) {
 					}
 					button->setToolTip(action);
 					QObject::connect(button, &LaunchButton::launch, this, [action] {
-						QDesktopServices::openUrl({QString("file:///") + action});
+						QDesktopServices::openUrl(QUrl::fromLocalFile(action));
 					});
 					break;
 			}

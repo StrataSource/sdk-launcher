@@ -13,8 +13,9 @@ include(CheckIPOSupported)
 include(GNUInstallDirs)
 
 # Set up variables
-set(PROJECT_NAME_PRETTY "SDK Launcher" CACHE STRING "" FORCE)
-set(PROJECT_TARGET_NAME "SDKLauncher"  CACHE STRING "" FORCE)
+set(PROJECT_NAME_PRETTY  "SDK Launcher"  CACHE STRING "" FORCE)
+set(PROJECT_TARGET_NAME  "SDKLauncher"   CACHE STRING "" FORCE)
+set(PROJECT_ORGANIZATION "Strata Source" CACHE STRING "" FORCE)
 
 # Helper for creating enum options (pick between certain strings)
 macro(option_enum)

@@ -10,9 +10,11 @@ GameConfig::ActionType GameConfig::actionTypeFromString(const QString& string) {
 	using enum ActionType;
 	if (string == "command") {
 		return COMMAND;
-	} else if (string == "link") {
+	}
+	if (string == "link") {
 		return LINK;
-	} else if (string == "directory") {
+	}
+	if (string == "directory") {
 		return DIRECTORY;
 	}
 	return INVALID;
@@ -43,7 +45,7 @@ std::optional<GameConfig> GameConfig::parse(const QString& path) {
 		return std::nullopt;
 	}
 
-	QJsonDocument configJson = QJsonDocument::fromJson(config.toUtf8());
+	const QJsonDocument configJson = QJsonDocument::fromJson(config.toUtf8());
 	if (!configJson.isObject()) {
 		return std::nullopt;
 	}
@@ -81,9 +83,8 @@ std::optional<GameConfig> GameConfig::parse(const QString& path) {
 	if (!configObject.contains("sections") || !configObject["sections"].isArray()) {
 		return std::nullopt;
 	}
-	QJsonArray sections = configObject["sections"].toArray();
 
-	for (const auto& sectionValue : sections) {
+	for (const auto& sectionValue : configObject["sections"].toArray()) {
 		if (!sectionValue.isObject()) {
 			continue;
 		}
@@ -96,8 +97,7 @@ std::optional<GameConfig> GameConfig::parse(const QString& path) {
 		auto& gameConfigSection = gameConfig.sections.emplace_back();
 		gameConfigSection.name = sectionObject["name"].toString();
 
-		auto entries = sectionObject["entries"].toArray();
-		for (const auto& entryValue : entries) {
+		for (const auto& entryValue : sectionObject["entries"].toArray()) {
 			if (!entryValue.isObject()) {
 				continue;
 			}
@@ -125,7 +125,7 @@ std::optional<GameConfig> GameConfig::parse(const QString& path) {
 				gameConfigSectionEntry.iconOverride = entryObject["icon_override"].toString();
 			}
 
-			auto os = static_cast<unsigned char>((!entryObject.contains("os") || !entryObject["os"].isString()) ? OS::ALL : osFromString(entryObject["os"].toString()));
+			const auto os = static_cast<unsigned char>((!entryObject.contains("os") || !entryObject["os"].isString()) ? OS::ALL : osFromString(entryObject["os"].toString()));
 #if defined(_WIN32)
 			if (!(os & static_cast<unsigned char>(OS::WINDOWS))) {
 				gameConfigSection.entries.pop_back();
@@ -150,9 +150,9 @@ void GameConfig::setVariable(const QString& variable, const QString& replacement
 	};
 	setVar(this->gameDefault);
 	setVar(this->gameIcon);
-	for (auto& section : this->sections) {
-		setVar(section.name);
-		for (auto& entry : section.entries) {
+	for (auto& [sectionName, entries] : this->sections) {
+		setVar(sectionName);
+		for (auto& entry : entries) {
 			setVar(entry.name);
 			setVar(entry.action);
 			for (auto& argument : entry.arguments) {

@@ -94,8 +94,7 @@ Window::Window(QWidget* parent)
 	configMenu->addSeparator();
 
 	configMenu->addAction(this->style()->standardIcon(QStyle::SP_DirIcon), tr("Load Custom..."), Qt::CTRL | Qt::Key_O, [this] {
-		auto filename = QFileDialog::getOpenFileName(this, tr("Open Config"));
-		if (!filename.isEmpty()) {
+		if (const auto filename = QFileDialog::getOpenFileName(this, tr("Open Config")); !filename.isEmpty()) {
 			this->loadGameConfig(filename);
 		}
 	});
@@ -108,7 +107,7 @@ Window::Window(QWidget* parent)
 
 	this->game_overrideGame = gameMenu->addAction(tr("Override Game Folder"), [this] {
 		const auto rootPath = ::getRootPath(this->configUsingLegacyBinDir);
-		if (auto path = QFileDialog::getExistingDirectory(this, tr("Override Game Folder"), rootPath); !path.isEmpty()) {
+		if (const auto path = QFileDialog::getExistingDirectory(this, tr("Override Game Folder"), rootPath); !path.isEmpty()) {
 			const QDir rootDir{rootPath};
 			QSettings settings;
 			settings.setValue(STR_GAME_OVERRIDE, QDir::cleanPath(rootDir.relativeFilePath(path)));
@@ -131,7 +130,7 @@ Window::Window(QWidget* parent)
 
 	this->utilities_createNewAddon = utilitiesMenu->addAction(this->style()->standardIcon(QStyle::SP_FileIcon), tr("Create New Addon"), [this] {
 		QString gameRoot;
-		if (QSettings settings; settings.contains(STR_GAME_OVERRIDE)) {
+		if (const QSettings settings; settings.contains(STR_GAME_OVERRIDE)) {
 			gameRoot = settings.value(STR_GAME_OVERRIDE).toString();
 		} else {
 			gameRoot = this->gameDefault;
@@ -171,10 +170,9 @@ Window::Window(QWidget* parent)
 
 	new QVBoxLayout(this->main);
 
-	QSettings settings;
-	if (!settings.contains(STR_RECENT_CONFIGS) || settings.value(STR_RECENT_CONFIGS).value<QStringList>().empty()) {
+	if (QSettings settings; !settings.contains(STR_RECENT_CONFIGS) || settings.value(STR_RECENT_CONFIGS).value<QStringList>().empty()) {
 		settings.setValue(STR_RECENT_CONFIGS, QStringList{});
-		if (auto defaultConfigPath = QCoreApplication::applicationDirPath() + "/SDKLauncherDefault.json"; QFile::exists(defaultConfigPath)) {
+		if (const auto defaultConfigPath = QCoreApplication::applicationDirPath() + "/SDKLauncherDefault.json"; QFile::exists(defaultConfigPath)) {
 			this->loadGameConfig(defaultConfigPath);
 		} else {
 			this->loadGameConfig(QString(":/config/%1.json").arg(PROJECT_DEFAULT_MOD.data()));
@@ -258,7 +256,7 @@ void Window::loadGameConfig(const QString& path) {
 	// tiny hack: get default game icon before ${GAME} substitution
 	QString defaultGameIconPath = gameConfig->getGameIcon();
 	defaultGameIconPath.replace("${GAME}", this->gameDefault);
-	if (QIcon defaultGameIcon{defaultGameIconPath}; !defaultGameIcon.isNull() && !defaultGameIcon.availableSizes().isEmpty()) {
+	if (const QIcon defaultGameIcon{defaultGameIconPath}; !defaultGameIcon.isNull() && !defaultGameIcon.availableSizes().isEmpty()) {
 		this->config_loadDefault->setIcon(defaultGameIcon);
 		this->game_resetToDefault->setIcon(defaultGameIcon);
 	} else {
@@ -267,11 +265,11 @@ void Window::loadGameConfig(const QString& path) {
 	}
 
 	// Set ${GAME}
-	QString gameDir = settings.contains(STR_GAME_OVERRIDE) ? settings.value(STR_GAME_OVERRIDE).toString() : this->gameDefault;
+	const QString gameDir = settings.contains(STR_GAME_OVERRIDE) ? settings.value(STR_GAME_OVERRIDE).toString() : this->gameDefault;
 	gameConfig->setVariable("GAME", gameDir);
 
 	// Set ${GAME_ICON}
-	if (QIcon gameIcon{gameConfig->getGameIcon()}; !gameIcon.isNull() && !gameIcon.availableSizes().isEmpty()) {
+	if (const QIcon gameIcon{gameConfig->getGameIcon()}; !gameIcon.isNull() && !gameIcon.availableSizes().isEmpty()) {
 		this->game_overrideGame->setIcon(gameIcon);
 		gameConfig->setVariable("GAME_ICON", gameConfig->getGameIcon());
 	} else {
@@ -340,8 +338,7 @@ void Window::loadGameConfig(const QString& path) {
 									error = tr("The process failed to start. Perhaps the executable it points to might not exist?");
 									break;
 								case Crashed: {
-									auto timeEnd = std::chrono::steady_clock::now();
-									if (std::chrono::duration<float, std::milli>(timeEnd - timeStart).count() > 30'000) {
+									if (const auto timeEnd = std::chrono::steady_clock::now(); std::chrono::duration<float, std::milli>(timeEnd - timeStart).count() > 30'000) {
 										return;
 									}
 									error = tr("The process crashed.");

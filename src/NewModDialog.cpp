@@ -40,8 +40,7 @@ namespace {
 	std::filesystem::create_directories(std::filesystem::path{path.toLocal8Bit().constData()}.parent_path());
 
 	QFile file{path};
-	file.open(QIODevice::WriteOnly);
-	if (!file.isOpen()) {
+	if (!file.open(QIODevice::WriteOnly)) {
 		return false;
 	}
 	file.write(data);
@@ -50,8 +49,7 @@ namespace {
 }
 
 [[nodiscard]] bool extractZIP(const QByteArray& zip, const QString& outputDir, QWidget* parent) {
-	mz_zip_archive zipArchive;
-	std::memset(&zipArchive, 0, sizeof(zipArchive));
+	mz_zip_archive zipArchive{};
 
 	if (!mz_zip_reader_init_mem(&zipArchive, zip.data(), zip.size(), 0)) {
 		return false;

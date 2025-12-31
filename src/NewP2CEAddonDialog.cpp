@@ -70,20 +70,17 @@ NewP2CEAddonDialog::NewP2CEAddonDialog(QString gameRoot_, QWidget* parent)
 		}
 
 		// Create directory structure
-		QDir dir{this->getAddonInstallDir()};
-		dir.mkpath("maps");
-		dir.mkpath("materials");
-		dir.mkpath("models");
-		dir.mkpath("particles");
-		dir.mkpath("resource");
-		dir.mkpath("scenes");
-		dir.mkpath("scripts");
-		dir.mkpath("sound");
+		const QDir dir{this->getAddonInstallDir()};
+		(void) dir.mkpath("maps");
+		(void) dir.mkpath("materials");
+		(void) dir.mkpath("models");
+		(void) dir.mkpath("particles");
+		(void) dir.mkpath("resource");
+		(void) dir.mkpath("scenes");
+		(void) dir.mkpath("scripts");
+		(void) dir.mkpath("sound");
 
 		// Create addon.kv3
-		QFile addonKV3{this->getAddonInstallDir() + QDir::separator() + "addon.kv3"};
-		addonKV3.open(QIODevice::WriteOnly | QIODevice::Text);
-
 		static constexpr auto p2ceAddonKV3ContentsBase = R"({
 	mod = "%1"
 	description = """
@@ -105,11 +102,15 @@ NewP2CEAddonDialog::NewP2CEAddonDialog(QString gameRoot_, QWidget* parent)
 		cover = ""
 	}
 })";
-		{
+		QFile addonKV3{this->getAddonInstallDir() + QDir::separator() + "addon.kv3"};
+		if (addonKV3.open(QIODevice::WriteOnly | QIODevice::Text)) {
 			QTextStream out{&addonKV3};
 			out << QString{p2ceAddonKV3ContentsBase}.arg(this->addonName->text(), this->addonDesc->toPlainText(), this->addonType->currentText()).toLocal8Bit();
+			addonKV3.close();
+		} else {
+			QMessageBox::critical(this, tr("File Creation Error"), tr("Failed to create addon.kv3 file."));
+			return;
 		}
-		addonKV3.close();
 
 		// Create desktop shortcut
 		if (this->addShortcutOnDesktop->isChecked()) {

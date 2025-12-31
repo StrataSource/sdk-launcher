@@ -3,6 +3,7 @@
 #include <string_view>
 
 constexpr std::string_view PROJECT_NAME         = "${PROJECT_NAME_PRETTY}";
+constexpr std::string_view PROJECT_TARGET_NAME  = "${PROJECT_TARGET_NAME}";
 constexpr std::string_view PROJECT_ORGANIZATION = "${PROJECT_ORGANIZATION}";
 constexpr std::string_view PROJECT_VERSION      = "${PROJECT_VERSION}";
 constexpr std::string_view PROJECT_HOMEPAGE     = "${PROJECT_HOMEPAGE_URL}";

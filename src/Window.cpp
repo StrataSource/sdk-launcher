@@ -102,10 +102,10 @@ Window::Window(QWidget* parent)
 	configMenu->addSeparator();
 
 	auto* singleClickToRunAction = configMenu->addAction(tr("Single-Click to Run"), [] {
-		::options().setValue(BOOL_SINGLE_CLICK_TO_RUN, !::options().value(BOOL_SINGLE_CLICK_TO_RUN, BOOL_SINGLE_CLICK_TO_RUN_DEFAULT).toBool());
+		Options::set(BOOL_SINGLE_CLICK_TO_RUN, !Options::get<bool>(BOOL_SINGLE_CLICK_TO_RUN, BOOL_SINGLE_CLICK_TO_RUN_DEFAULT));
 	});
 	singleClickToRunAction->setCheckable(true);
-	singleClickToRunAction->setChecked(::options().value(BOOL_SINGLE_CLICK_TO_RUN, BOOL_SINGLE_CLICK_TO_RUN_DEFAULT).toBool());
+	singleClickToRunAction->setChecked(Options::get<bool>(BOOL_SINGLE_CLICK_TO_RUN, BOOL_SINGLE_CLICK_TO_RUN_DEFAULT));
 
 	// Game menu
 	auto* gameMenu = this->menuBar()->addMenu(tr("Game"));
@@ -114,14 +114,14 @@ Window::Window(QWidget* parent)
 		const auto rootPath = ::getRootPath(this->configUsingLegacyBinDir);
 		if (const auto path = QFileDialog::getExistingDirectory(this, tr("Override Game Folder"), rootPath); !path.isEmpty()) {
 			const QDir rootDir{rootPath};
-			::options().setValue(STR_GAME_OVERRIDE, QDir::cleanPath(rootDir.relativeFilePath(path)));
-			this->loadGameConfig(::options().value(STR_RECENT_CONFIGS).toStringList().first());
+			Options::set(STR_GAME_OVERRIDE, QDir::cleanPath(rootDir.relativeFilePath(path)));
+			this->loadMostRecentGameConfig();
 		}
 	});
 
 	this->game_resetToDefault = gameMenu->addAction(tr("Reset to Default"), [this] {
-		::options().remove(STR_GAME_OVERRIDE);
-		this->loadGameConfig(::options().value(STR_RECENT_CONFIGS).toStringList().first());
+		Options::remove(STR_GAME_OVERRIDE);
+		this->loadMostRecentGameConfig();
 	});
 
 	// Utilities menu
@@ -133,8 +133,8 @@ Window::Window(QWidget* parent)
 
 	this->utilities_createNewAddon = utilitiesMenu->addAction(this->style()->standardIcon(QStyle::SP_FileIcon), tr("Create New Addon"), [this] {
 		QString gameRoot;
-		if (::options().contains(STR_GAME_OVERRIDE)) {
-			gameRoot = ::options().value(STR_GAME_OVERRIDE).toString();
+		if (Options::contains(STR_GAME_OVERRIDE)) {
+			gameRoot = Options::get<QString>(STR_GAME_OVERRIDE);
 		} else {
 			gameRoot = this->gameDefault;
 		}
@@ -173,11 +173,10 @@ Window::Window(QWidget* parent)
 
 	new QVBoxLayout(this->main);
 
-	if (!::options().contains(STR_RECENT_CONFIGS) || ::options().value(STR_RECENT_CONFIGS).value<QStringList>().empty()) {
-		::options().setValue(STR_RECENT_CONFIGS, QStringList{});
-
+	if (!Options::contains(STR_RECENT_CONFIGS) || Options::get<QStringList>(STR_RECENT_CONFIGS).empty()) {
+		Options::set(STR_RECENT_CONFIGS, QStringList{});
 	} else {
-		this->loadGameConfig(::options().value(STR_RECENT_CONFIGS).value<QStringList>().first());
+		this->loadMostRecentGameConfig();
 	}
 }
 
@@ -193,6 +192,14 @@ QString Window::getSDKLauncherIconPath() {
 		return ":/icons/p2ce_sdk.png";
 	} else {
 		return getStrataIconPath();
+	}
+}
+
+void Window::loadMostRecentGameConfig() {
+	if (const auto recentConfigs = Options::get<QStringList>(STR_RECENT_CONFIGS); recentConfigs.isEmpty()) {
+		this->loadDefaultGameConfig();
+	} else {
+		this->loadGameConfig(recentConfigs.first());
 	}
 }
 
@@ -221,7 +228,7 @@ void Window::loadGameConfig(const QString& path) {
 	this->utilities_createNewMod->setDisabled(this->configModTemplateURL.isEmpty());
 	this->utilities_createNewAddon->setDisabled(!gameConfig->supportsP2CEAddons());
 
-	auto recentConfigs = ::options().value(STR_RECENT_CONFIGS).value<QStringList>();
+	auto recentConfigs = Options::get<QStringList>(STR_RECENT_CONFIGS);
 	if (recentConfigs.contains(path)) {
 		recentConfigs.removeAt(recentConfigs.indexOf(path));
 	}
@@ -229,7 +236,7 @@ void Window::loadGameConfig(const QString& path) {
 	if (recentConfigs.size() > 10) {
 		recentConfigs.pop_back();
 	}
-	::options().setValue(STR_RECENT_CONFIGS, recentConfigs);
+	Options::set(STR_RECENT_CONFIGS, recentConfigs);
 	this->regenerateRecentConfigs();
 
 	// Set ${SOURCEMODS}
@@ -271,7 +278,7 @@ void Window::loadGameConfig(const QString& path) {
 	}
 
 	// Set ${GAME}
-	const QString gameDir = ::options().contains(STR_GAME_OVERRIDE) ? ::options().value(STR_GAME_OVERRIDE).toString() : this->gameDefault;
+	const QString gameDir = Options::contains(STR_GAME_OVERRIDE) ? Options::get<QString>(STR_GAME_OVERRIDE) : this->gameDefault;
 	gameConfig->setVariable("GAME", gameDir);
 
 	// Set ${GAME_ICON}
@@ -403,7 +410,7 @@ void Window::loadGameConfig(const QString& path) {
 void Window::regenerateRecentConfigs() {
 	this->recent->clear();
 
-	auto paths = ::options().value(STR_RECENT_CONFIGS).value<QStringList>();
+	auto paths = Options::get<QStringList>(STR_RECENT_CONFIGS);
 	if (paths.empty()) {
 		auto* noRecentFilesAction = this->recent->addAction(tr("No recent files."));
 		noRecentFilesAction->setDisabled(true);
@@ -416,7 +423,7 @@ void Window::regenerateRecentConfigs() {
 	}
 	this->recent->addSeparator();
 	this->recent->addAction(tr("Clear"), [this] {
-		::options().remove(STR_RECENT_CONFIGS);
+		Options::remove(STR_RECENT_CONFIGS);
 		this->regenerateRecentConfigs();
 	});
 }

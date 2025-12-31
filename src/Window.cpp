@@ -173,11 +173,7 @@ Window::Window(QWidget* parent)
 
 	new QVBoxLayout(this->main);
 
-	if (!Options::contains(STR_RECENT_CONFIGS) || Options::get<QStringList>(STR_RECENT_CONFIGS).empty()) {
-		Options::set(STR_RECENT_CONFIGS, QStringList{});
-	} else {
-		this->loadMostRecentGameConfig();
-	}
+	this->loadMostRecentGameConfig();
 }
 
 QString Window::getStrataIconPath() {

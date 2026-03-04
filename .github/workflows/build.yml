@@ -56,7 +56,7 @@ jobs:
           cmake --build . --config ${{matrix.build_type}} -t SDKLauncher -- -j%NUMBER_OF_PROCESSORS%
 
       - name: Upload SDK Launcher
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: 'SDKLauncher-${{matrix.target}}-Windows-${{matrix.compiler}}-${{matrix.build_type}}'
           path: ${{env.BUILD_DIR}}/SDKLauncher.exe
@@ -105,7 +105,7 @@ jobs:
         run: cmake --build . --config ${{matrix.build_type}} -t SDKLauncher -- -j$(nproc)
 
       - name: Upload SDK Launcher
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: 'SDKLauncher-${{matrix.target}}-Linux-${{matrix.compiler}}-${{matrix.build_type}}'
           path: ${{env.BUILD_DIR}}/SDKLauncher
@@ -142,7 +142,7 @@ jobs:
             console.log("Artifact download complete!");
 
       - name: Upload Release
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: Release-Artifacts
           path: |

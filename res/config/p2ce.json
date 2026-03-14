@@ -15,14 +15,14 @@
           "icon_override": "${GAME_ICON}"
         },
         {
-          "name": "Portal 2: CE - Dev && Tools Mode",
+          "name": "Portal 2: CE - Dev Mode (Verbose Entity I/O and Logfile)",
           "type": "command",
           "action": "${ROOT}/bin/${PLATFORM}/p2ce",
-          "arguments": ["-game", "${GAME}", "-dev", "-console", "-tools"],
+          "arguments": ["-game", "${GAME}", "-dev", "+developer 2", "-console", "-condebug"],
           "icon_override": "${GAME_ICON}"
         },
         {
-          "name": "Portal 2: CE - Safe Mode",
+          "name": "Portal 2: CE - Safe Mode (No Custom Content)",
           "type": "command",
           "action": "${ROOT}/bin/${PLATFORM}/p2ce",
           "arguments": ["-game", "${GAME}", "-nousermount", "-nocustommount"],
@@ -52,6 +52,13 @@
           "action": "${ROOT}/bin/win64/hlfaceposer",
           "arguments": ["-game", "${GAME}"],
           "os": "windows"
+        },
+        {
+          "name": "Engine Tools Mode",
+          "type": "command",
+          "action": "${ROOT}/bin/${PLATFORM}/p2ce",
+          "arguments": ["-game", "${GAME}", "-dev", "-console", "-tools"],
+          "icon_override": "${GAME_ICON}"
         },
         {
           "name": "VPKEdit",

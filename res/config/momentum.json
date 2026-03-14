@@ -11,11 +11,11 @@
           "arguments": ["-game", "${GAME}", "-dev", "-console"],
           "icon_override": "${GAME_ICON}"
         },
-        {
-          "name": "Momentum Mod - Dev && Tools Mode",
+		{
+          "name": "Momentum Mod - Dev Mode (Verbose Entity I/O and Logfile)",
           "type": "command",
           "action": "${ROOT}/bin/${PLATFORM}/momentum",
-          "arguments": ["-game", "${GAME}", "-dev", "-console", "-tools"],
+          "arguments": ["-game", "${GAME}", "-dev", "+developer 2", "-console", "-condebug"],
           "icon_override": "${GAME_ICON}"
         },
         {
@@ -49,6 +49,13 @@
           "action": "${ROOT}/bin/win64/hlfaceposer",
           "arguments": ["-game", "${GAME}"],
           "os": "windows"
+        },
+        {
+          "name": "Engine Tools Mode",
+          "type": "command",
+          "action": "${ROOT}/bin/${PLATFORM}/momentum",
+          "arguments": ["-game", "${GAME}", "-dev", "-console", "-tools"],
+          "icon_override": "${GAME_ICON}"
         }
       ]
     },

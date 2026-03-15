@@ -12,14 +12,21 @@
           "icon_override": "${GAME_ICON}"
         },
         {
-          "name": "Momentum Mod - Dev && Tools Mode",
+          "name": "Momentum Mod - Dev Mode (Verbose Entity I/O && Log to File)",
+          "type": "command",
+          "action": "${ROOT}/bin/${PLATFORM}/momentum",
+          "arguments": ["-game", "${GAME}", "-dev", "+developer 2", "-console", "-condebug"],
+          "icon_override": "${GAME_ICON}"
+        },
+        {
+          "name": "Momentum Mod - Tools Mode",
           "type": "command",
           "action": "${ROOT}/bin/${PLATFORM}/momentum",
           "arguments": ["-game", "${GAME}", "-dev", "-console", "-tools"],
           "icon_override": "${GAME_ICON}"
         },
         {
-          "name": "Momentum Mod - Safe Mode (No Custom Content)",
+          "name": "Momentum Mod - Safe Mode (No Mounted Content)",
           "type": "command",
           "action": "${ROOT}/bin/${PLATFORM}/momentum",
           "arguments": ["-game", "${GAME}", "-nousermount", "-nocustommount"],

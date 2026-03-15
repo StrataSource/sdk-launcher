@@ -89,6 +89,11 @@
           "name": "SDK Content",
           "type": "directory",
           "action": "${ROOT}/sdk_content"
+        },
+        {
+          "name": "Steam SourceMods",
+          "type": "directory",
+          "action": "${SOURCEMODS}"
         }
       ]
     }

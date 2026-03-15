@@ -12,10 +12,17 @@
           "icon_override": "${GAME_ICON}"
         },
         {
-          "name": "Portal 2: CE - Dev Mode (Verbose Entity I/O and Logfile)",
+          "name": "Portal: Revolution - Dev Mode (Verbose Entity I/O && Log to File)",
           "type": "command",
           "action": "${ROOT}/bin/${PLATFORM}/revolution",
           "arguments": ["-game", "${GAME}", "-dev", "+developer 2", "-console", "-condebug"],
+          "icon_override": "${GAME_ICON}"
+        },
+        {
+          "name": "Portal: Revolution - Tools Mode",
+          "type": "command",
+          "action": "${ROOT}/bin/${PLATFORM}/revolution",
+          "arguments": ["-game", "${GAME}", "-dev", "-console", "-tools"],
           "icon_override": "${GAME_ICON}"
         },
         {
@@ -49,13 +56,6 @@
           "action": "${ROOT}/bin/win64/hlfaceposer",
           "arguments": ["-game", "${GAME}"],
           "os": "windows"
-        },
-        {
-          "name": "Engine Tools Mode",
-          "type": "command",
-          "action": "${ROOT}/bin/${PLATFORM}/revolution",
-          "arguments": ["-game", "${GAME}", "-dev", "-console", "-tools"],
-          "icon_override": "${GAME_ICON}"
         }
       ]
     },

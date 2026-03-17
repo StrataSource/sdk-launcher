@@ -12,7 +12,14 @@
           "icon_override": "${GAME_ICON}"
         },
         {
-          "name": "Portal: Revolution - Dev && Tools Mode",
+          "name": "Portal: Revolution - Dev Mode (Verbose Entity I/O && Log to File)",
+          "type": "command",
+          "action": "${ROOT}/bin/${PLATFORM}/revolution",
+          "arguments": ["-game", "${GAME}", "-dev", "+developer 2", "-console", "-condebug"],
+          "icon_override": "${GAME_ICON}"
+        },
+        {
+          "name": "Portal: Revolution - Tools Mode",
           "type": "command",
           "action": "${ROOT}/bin/${PLATFORM}/revolution",
           "arguments": ["-game", "${GAME}", "-dev", "-console", "-tools"],
@@ -21,7 +28,7 @@
         {
           "name": "Portal: Revolution - Safe Mode (No Custom Content)",
           "type": "command",
-          "action": "${ROOT}/bin/${PLATFORM}/chaos",
+          "action": "${ROOT}/bin/${PLATFORM}/revolution",
           "arguments": ["-game", "${GAME}", "-nousermount", "-nocustommount"],
           "icon_override": "${GAME_ICON}"
         }
@@ -72,6 +79,21 @@
           "type": "link",
           "action": "https://github.com/StrataSource/Engine/issues",
           "icon_override": "${STRATA_ICON}"
+        }
+      ]
+    },
+    {
+      "name": "Quick Access",
+      "entries": [
+        {
+          "name": "SDK Content",
+          "type": "directory",
+          "action": "${ROOT}/sdk_content"
+        },
+        {
+          "name": "Steam SourceMods",
+          "type": "directory",
+          "action": "${SOURCEMODS}"
         }
       ]
     }

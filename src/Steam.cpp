@@ -17,57 +17,77 @@ namespace {
 
 #ifdef _WIN32
 	{
-		// 16383 being the maximum length of a path
-		static constexpr DWORD STEAM_LOCATION_MAX_SIZE = 16383;
-		std::unique_ptr<char[]> steamLocationData{new char[STEAM_LOCATION_MAX_SIZE]};
+		// 16384 being the maximum length of a null-terminated path
+		static constexpr DWORD STEAM_LOCATION_MAX_SIZE = 16384;
+		std::unique_ptr<wchar_t[]> steamLocationData{new wchar_t[STEAM_LOCATION_MAX_SIZE] {}};
 
 		HKEY steam;
-		if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, R"(SOFTWARE\Valve\Steam)", 0, KEY_QUERY_VALUE | KEY_WOW64_32KEY, &steam) != ERROR_SUCCESS) {
-			return "";
+		if (
+			RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Valve\\Steam", 0, KEY_QUERY_VALUE | KEY_WOW64_32KEY, &steam) != ERROR_SUCCESS &&
+			RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Valve\\Steam", 0, KEY_QUERY_VALUE | KEY_WOW64_64KEY, &steam) != ERROR_SUCCESS
+		) {
+			return;
 		}
 
-		DWORD steamLocationSize = STEAM_LOCATION_MAX_SIZE;
-		if (RegQueryValueExA(steam, "InstallPath", nullptr, nullptr, reinterpret_cast<LPBYTE>(steamLocationData.get()), &steamLocationSize) != ERROR_SUCCESS) {
-			return "";
+		DWORD steamLocationSize = STEAM_LOCATION_MAX_SIZE * sizeof(wchar_t);
+		if (RegQueryValueExW(steam, L"InstallPath", nullptr, nullptr, reinterpret_cast<LPBYTE>(steamLocationData.get()), &steamLocationSize) != ERROR_SUCCESS) {
+			RegCloseKey(steam);
+			return;
 		}
-
 		RegCloseKey(steam);
-		steamLocation = steamLocationSize > 0 ? std::string(steamLocationData.get(), steamLocationSize - 1) : "";
+
+		steamLocation = steamLocationSize > 0 ? std::filesystem::path{steamLocationData.get()} : std::filesystem::path{};
 	}
 #else
 	{
-		const std::filesystem::path home{std::getenv("HOME")};
-#ifdef __APPLE__
-		steamLocation = home / "Library" / "Application Support" / "Steam";
-#else
-		// Snap install takes priority, the .steam symlink may exist simultaneously with Snap installs
-		steamLocation = home / "snap" / "steam" / "common" / ".steam" / "steam";
-
-		if (!std::filesystem::exists(steamLocation, ec)) {
-			// Use the regular install path
-			steamLocation = home / ".steam" / "steam";
+		std::filesystem::path HOME{"~"};
+		if (const auto* homeEnv = std::getenv("HOME")) {
+			HOME = homeEnv;
 		}
-#endif
-	}
+#ifdef __APPLE__
+		steamLocation = HOME / "Library" / "Application Support" / "Steam";
+#else
+		std::filesystem::path XDG_DATA_HOME{HOME / ".local" / "share"};
+		if (const auto* xdgDataHomeEnv = std::getenv("XDG_DATA_HOME")) {
+			XDG_DATA_HOME = xdgDataHomeEnv;
+		}
 
-	if (!std::filesystem::exists(steamLocation, ec)) {
-		std::string location;
-		const std::filesystem::path d{"cwd/steamclient64.dll"};
-		for (const auto& entry : std::filesystem::directory_iterator{"/proc/"}) {
-			if (std::filesystem::exists(entry / d, ec)) {
-				ec.clear();
-				const auto s = std::filesystem::read_symlink(entry.path() / "cwd", ec);
-				if (ec) {
-					continue;
-				}
-				location = s.string();
+		const std::array locations{
+			HOME / "snap" / "steam" / "common" / ".local" / "share" / "Steam", // snap install
+			HOME / "snap" / "steam" / "common" / ".steam" / "steam", // snap symlink
+			HOME / ".var" / "app" / "com.valvesoftware.Steam" / ".local" / "share" / "Steam", // flatpak install
+			HOME / ".var" / "app" / "com.valvesoftware.Steam" / ".steam" / "steam", // flatpak symlink
+			XDG_DATA_HOME / "Steam", // expected install (XDG_DATA_HOME)
+			HOME / ".local" / "share" / "Steam", // expected install (HOME)
+			HOME / ".steam" / "steam", // expected symlink
+		};
+
+		for (const auto& location : locations) {
+			if (std::filesystem::exists(location, ec)) {
+				steamLocation = location;
 				break;
 			}
 		}
-		if (location.empty()) {
-			return "";
+		if (steamLocation.empty()) {
+			// Find where the Steam process is running from
+			std::filesystem::path location;
+			const std::filesystem::path d{"cwd/steamclient64.dll"};
+			for (const auto& entry : std::filesystem::directory_iterator{"/proc/"}) {
+				if (std::filesystem::exists(entry / d, ec)) {
+					ec.clear();
+					location = std::filesystem::read_symlink(entry.path() / "cwd", ec);
+					if (ec) {
+						continue;
+					}
+					break;
+				}
+			}
+			if (location.empty()) {
+				return "";
+			}
+			steamLocation = location;
 		}
-		steamLocation = location;
+#endif
 	}
 #endif
 

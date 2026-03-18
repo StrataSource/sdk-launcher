@@ -1,6 +1,7 @@
 {
   "game_default": "p2ce",
-  "window_height": 647,
+  "window_width": 308,
+  "window_height": 621,
   "mod_template_url": "https://github.com/StrataSource/p2ce-mod-template/archive/refs/heads/main.zip",
   "supports_p2ce_addons": true,
   "sections": [
@@ -15,21 +16,14 @@
           "icon_override": "${GAME_ICON}"
         },
         {
-          "name": "Portal 2: CE - Dev Mode (Verbose Entity I/O && Log to File)",
+          "name": "Portal 2: CE - Dev Mode (Verbose)",
           "type": "command",
           "action": "${ROOT}/bin/${PLATFORM}/p2ce",
           "arguments": ["-game", "${GAME}", "-dev", "+developer 2", "-console", "-condebug"],
           "icon_override": "${GAME_ICON}"
         },
         {
-          "name": "Portal 2: CE - Tools Mode",
-          "type": "command",
-          "action": "${ROOT}/bin/${PLATFORM}/p2ce",
-          "arguments": ["-game", "${GAME}", "-dev", "-console", "-tools"],
-          "icon_override": "${GAME_ICON}"
-        },
-        {
-          "name": "Portal 2: CE - Safe Mode (No Mounted Content)",
+          "name": "Portal 2: CE - Safe Mode (No Custom Content)",
           "type": "command",
           "action": "${ROOT}/bin/${PLATFORM}/p2ce",
           "arguments": ["-game", "${GAME}", "-nousermount", "-nocustommount"],
@@ -40,6 +34,13 @@
     {
       "name": "Tools",
       "entries": [
+        {
+          "name": "Portal 2: CE - Tools Mode",
+          "type": "command",
+          "action": "${ROOT}/bin/${PLATFORM}/p2ce",
+          "arguments": ["-game", "${GAME}", "-dev", "-console", "-tools"],
+          "icon_override": "${GAME_ICON}"
+        },
         {
           "name": "Hammer Editor",
           "type": "command",
@@ -59,7 +60,7 @@
           "action": "${ROOT}/bin/win64/hlfaceposer",
           "arguments": ["-game", "${GAME}"],
           "os": "windows"
-        }
+        },
         {
           "name": "VPKEdit",
           "type": "command",

@@ -31,8 +31,8 @@ Here is an example config file that may be loaded into the SDK launcher.
   "uses_legacy_bin_dir": false,
   // Optional, the default is 256 (changes the default width of the window)
   "window_width": 256,
-  // Optional, the default is 450 (changes the default height of the window)
-  "window_height": 450,
+  // Optional, the default is 300 (changes the default height of the window)
+  "window_height": 300,
   // Optional, holds the download URL of the mod template for the game (must point to a zip file)
   // For reference, this is the P2CE template mod download URL:
   "mod_template_url": "https://github.com/StrataSource/p2ce-mod-template/archive/refs/heads/main.zip",

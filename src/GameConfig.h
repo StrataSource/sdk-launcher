@@ -5,7 +5,7 @@
 #include <QString>
 
 constexpr int DEFAULT_WINDOW_WIDTH = 256;
-constexpr int DEFAULT_WINDOW_HEIGHT = 450;
+constexpr int DEFAULT_WINDOW_HEIGHT = 300;
 
 class GameConfig {
 public:

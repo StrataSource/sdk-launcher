@@ -4,6 +4,9 @@
 
 class QAction;
 class QMenu;
+class QResizeEvent;
+
+class LaunchButton;
 
 class Window : public QMainWindow {
 	Q_OBJECT;
@@ -23,6 +26,9 @@ public:
 
 	void regenerateRecentConfigs();
 
+protected:
+	void resizeEvent(QResizeEvent* event) override;
+
 private:
 	QString gameDefault;
 	bool configUsingLegacyBinDir;
@@ -36,4 +42,5 @@ private:
 	QAction* utilities_createNewAddon;
 
 	QWidget* main;
+	QList<LaunchButton*> buttons;
 };

@@ -1,5 +1,7 @@
 {
   "game_default": "momentum",
+  "window_width": 330,
+  "window_height": 300,
   "sections": [
     {
       "name": "Game",
@@ -12,21 +14,14 @@
           "icon_override": "${GAME_ICON}"
         },
         {
-          "name": "Momentum Mod - Dev Mode (Verbose Entity I/O && Log to File)",
+          "name": "Momentum Mod - Dev Mode (Verbose)",
           "type": "command",
           "action": "${ROOT}/bin/${PLATFORM}/momentum",
           "arguments": ["-game", "${GAME}", "-dev", "+developer 2", "-console", "-condebug"],
           "icon_override": "${GAME_ICON}"
         },
         {
-          "name": "Momentum Mod - Tools Mode",
-          "type": "command",
-          "action": "${ROOT}/bin/${PLATFORM}/momentum",
-          "arguments": ["-game", "${GAME}", "-dev", "-console", "-tools"],
-          "icon_override": "${GAME_ICON}"
-        },
-        {
-          "name": "Momentum Mod - Safe Mode (No Mounted Content)",
+          "name": "Momentum Mod - Safe Mode (No Custom Content)",
           "type": "command",
           "action": "${ROOT}/bin/${PLATFORM}/momentum",
           "arguments": ["-game", "${GAME}", "-nousermount", "-nocustommount"],
@@ -37,6 +32,13 @@
     {
       "name": "Tools",
       "entries": [
+        {
+          "name": "Momentum Mod - Tools Mode",
+          "type": "command",
+          "action": "${ROOT}/bin/${PLATFORM}/momentum",
+          "arguments": ["-game", "${GAME}", "-dev", "-console", "-tools"],
+          "icon_override": "${GAME_ICON}"
+        },
         {
           "name": "Hammer Editor",
           "type": "command",

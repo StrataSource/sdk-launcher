@@ -1,5 +1,7 @@
 {
   "game_default": "revolution",
+  "window_width": 335,
+  "window_height": 475,
   "sections": [
     {
       "name": "Game",
@@ -12,17 +14,10 @@
           "icon_override": "${GAME_ICON}"
         },
         {
-          "name": "Portal: Revolution - Dev Mode (Verbose Entity I/O && Log to File)",
+          "name": "Portal: Revolution - Dev Mode (Verbose)",
           "type": "command",
           "action": "${ROOT}/bin/${PLATFORM}/revolution",
           "arguments": ["-game", "${GAME}", "-dev", "+developer 2", "-console", "-condebug"],
-          "icon_override": "${GAME_ICON}"
-        },
-        {
-          "name": "Portal: Revolution - Tools Mode",
-          "type": "command",
-          "action": "${ROOT}/bin/${PLATFORM}/revolution",
-          "arguments": ["-game", "${GAME}", "-dev", "-console", "-tools"],
           "icon_override": "${GAME_ICON}"
         },
         {
@@ -37,6 +32,13 @@
     {
       "name": "Tools",
       "entries": [
+        {
+          "name": "Portal: Revolution - Tools Mode",
+          "type": "command",
+          "action": "${ROOT}/bin/${PLATFORM}/revolution",
+          "arguments": ["-game", "${GAME}", "-dev", "-console", "-tools"],
+          "icon_override": "${GAME_ICON}"
+        },
         {
           "name": "Hammer Editor",
           "type": "command",

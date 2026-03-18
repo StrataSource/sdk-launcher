@@ -1,3 +1,5 @@
+// ReSharper disable CppUseStructuredBinding
+
 #include "Window.h"
 
 #include <chrono>
@@ -183,6 +185,8 @@ QString Window::getStrataIconPath() {
 	return ":/icons/strata_light.png";
 }
 
+// ReSharper disable once CppDFAConstantFunctionResult
+// ReSharper disable once CppDFAUnreachableCode
 QString Window::getSDKLauncherIconPath() {
 	if constexpr (PROJECT_DEFAULT_MOD == "p2ce") {
 		return ":/icons/p2ce_sdk.png";
@@ -286,6 +290,7 @@ void Window::loadGameConfig(const QString& path) {
 		gameConfig->setVariable("GAME_ICON", "");
 	}
 
+	this->buttons.clear();
 	for (int i = 0; i < gameConfig->getSections().size(); i++) {
 		auto& section = gameConfig->getSections()[i];
 
@@ -306,8 +311,8 @@ void Window::loadGameConfig(const QString& path) {
 			button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 			button->setText(entry.name);
 			button->setIconSize({16, 16});
-			button->setFixedWidth(gameConfig->getWindowWidth() - 18);
 			layout->addWidget(button);
+			this->buttons.push_back(button);
 
 			bool iconSet = false;
 			if (!entry.iconOverride.isEmpty()) {
@@ -400,7 +405,8 @@ void Window::loadGameConfig(const QString& path) {
 
 	// Set window sizing
 	this->resize(gameConfig->getWindowWidth(), gameConfig->getWindowHeight());
-	this->setFixedWidth(gameConfig->getWindowWidth());
+	// Update button widths. Just in case
+	this->resizeEvent(nullptr);
 }
 
 void Window::regenerateRecentConfigs() {
@@ -422,4 +428,13 @@ void Window::regenerateRecentConfigs() {
 		Options::remove(STR_RECENT_CONFIGS);
 		this->regenerateRecentConfigs();
 	});
+}
+
+void Window::resizeEvent(QResizeEvent* event) {
+	for (auto* button : this->buttons) {
+		button->setFixedWidth(this->width() - 18);
+	}
+	if (event) {
+		QMainWindow::resizeEvent(event);
+	}
 }

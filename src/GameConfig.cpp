@@ -68,6 +68,10 @@ std::optional<GameConfig> GameConfig::parse(const QString& path) {
 		gameConfig.usesLegacyBinDir = configObject["uses_legacy_bin_dir"].toBool();
 	}
 
+	if (configObject.contains("window_width")) {
+		gameConfig.windowWidth = configObject["window_width"].toInt(DEFAULT_WINDOW_WIDTH);
+	}
+
 	if (configObject.contains("window_height")) {
 		gameConfig.windowHeight = configObject["window_height"].toInt(DEFAULT_WINDOW_HEIGHT);
 	}

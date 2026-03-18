@@ -29,6 +29,8 @@ Here is an example config file that may be loaded into the SDK launcher.
   "game_icon": "${ROOT}/${GAME}/resource/game.ico",
   // Optional, the default is false (set this to true if the SDK launcher is inside bin/ instead of bin/${PLATFORM}/)
   "uses_legacy_bin_dir": false,
+  // Optional, the default is 256 (changes the default width of the window)
+  "window_width": 256,
   // Optional, the default is 450 (changes the default height of the window)
   "window_height": 450,
   // Optional, holds the download URL of the mod template for the game (must point to a zip file)

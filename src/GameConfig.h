@@ -48,7 +48,7 @@ public:
 
 	[[nodiscard]] bool getUsesLegacyBinDir() const { return this->usesLegacyBinDir; }
 
-	[[nodiscard]] int getWindowWidth() const { return DEFAULT_WINDOW_WIDTH; }
+	[[nodiscard]] int getWindowWidth() const { return this->windowWidth; }
 
 	[[nodiscard]] int getWindowHeight() const { return this->windowHeight; }
 
@@ -64,6 +64,7 @@ private:
 	QString gameDefault;
 	QString gameIcon;
 	bool usesLegacyBinDir = false;
+	int windowWidth = DEFAULT_WINDOW_WIDTH;
 	int windowHeight = DEFAULT_WINDOW_HEIGHT;
 	QString modTemplateURL;
 	bool p2ceAddonsSupported = false;

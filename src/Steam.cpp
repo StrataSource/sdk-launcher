@@ -26,13 +26,13 @@ namespace {
 			RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Valve\\Steam", 0, KEY_QUERY_VALUE | KEY_WOW64_32KEY, &steam) != ERROR_SUCCESS &&
 			RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Valve\\Steam", 0, KEY_QUERY_VALUE | KEY_WOW64_64KEY, &steam) != ERROR_SUCCESS
 		) {
-			return;
+			return "";
 		}
 
 		DWORD steamLocationSize = STEAM_LOCATION_MAX_SIZE * sizeof(wchar_t);
 		if (RegQueryValueExW(steam, L"InstallPath", nullptr, nullptr, reinterpret_cast<LPBYTE>(steamLocationData.get()), &steamLocationSize) != ERROR_SUCCESS) {
 			RegCloseKey(steam);
-			return;
+			return "";
 		}
 		RegCloseKey(steam);
 

@@ -151,10 +151,10 @@ Window::Window(QWidget* parent)
 
 	helpMenu->addAction(this->style()->standardIcon(QStyle::SP_DialogHelpButton), tr("About"), Qt::Key_F1, [this] {
 		QMessageBox about(this);
-		about.setWindowTitle(tr("About"));
+		about.setWindowTitle(PROJECT_TITLE.data());
 		about.setIconPixmap(QIcon{getStrataIconPath()}.pixmap(64, 64));
 		about.setTextFormat(Qt::TextFormat::MarkdownText);
-		about.setText(QString("## %1\n*Created by Strata Source Contributors*\n<br/>\n").arg(PROJECT_TITLE.data()));
+		about.setText(QString("*Created by Strata Source Contributors.*\n\n[Free and open source on GitHub.](%1)\n").arg(PROJECT_HOMEPAGE.data()));
 		about.exec();
 	});
 

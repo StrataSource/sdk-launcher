@@ -62,14 +62,14 @@
           "os": "windows"
         },
         {
+          "name": "MareTF",
+          "type": "command",
+          "action": "${ROOT}/bin/${PLATFORM}/maretf_gui"
+        },
+        {
           "name": "VPKEdit",
           "type": "command",
           "action": "${ROOT}/bin/${PLATFORM}/vpkedit"
-        },
-        {
-          "name": "VTFView",
-          "type": "command",
-          "action": "${ROOT}/bin/${PLATFORM}/vtfview"
         },
         {
           "name": "Workshop Uploader",

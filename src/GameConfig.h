@@ -23,7 +23,8 @@ public:
 		NONE    = 0,
 		WINDOWS = 1 << 0,
 		LINUX   = 1 << 1,
-		ALL     = WINDOWS | LINUX,
+		MACOS   = 1 << 2,
+		ALL     = WINDOWS | LINUX | MACOS,
 	};
 
 	[[nodiscard]] static OS osFromString(const QString& string);

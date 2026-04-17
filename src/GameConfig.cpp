@@ -29,6 +29,9 @@ GameConfig::OS GameConfig::osFromString(const QString& string) {
 	if (string.contains("linux")) {
 		out |= static_cast<unsigned char>(LINUX);
 	}
+	if (string.contains("macos")) {
+		out |= static_cast<unsigned char>(MACOS);
+	}
 	if (out == static_cast<unsigned char>(NONE)) {
 		out = static_cast<unsigned char>(ALL);
 	}

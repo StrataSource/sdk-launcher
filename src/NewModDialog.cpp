@@ -271,9 +271,9 @@ NewModDialog::NewModDialog(QString gameRoot_, QString downloadURL_, QWidget* par
 			// If installing to sourcemods, tell user they will need to restart steam
 			if (this->parentFolder->count() == 3 && this->parentFolder->currentIndex() == 0) {
 				QMessageBox::information(this, tr("Info"), tr("Your mod has been installed to Steam's SourceMods folder, which means it will show up in your Steam library! This requires you to restart Steam once."));
-				QDesktopServices::openUrl({QString("file:///") + modInstallDir});
 			}
 
+			QDesktopServices::openUrl(QUrl::fromLocalFile(modInstallDir));
 			this->accept();
 		});
 	});

@@ -32,13 +32,13 @@ protected:
 private:
 	QString gameDefault;
 	bool configUsingLegacyBinDir;
-	QString configModTemplateURL;
+	QMap<QString, QString> configModTemplateURL;
 
 	QMenu* recent;
 	QAction* config_loadDefault;
 	QAction* game_overrideGame;
 	QAction* game_resetToDefault;
-	QAction* utilities_createNewMod;
+	QMenu* utilities_createNewMod;
 	QAction* utilities_createNewAddon;
 
 	QWidget* main;

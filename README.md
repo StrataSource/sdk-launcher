@@ -35,7 +35,12 @@ Here is an example config file that may be loaded into the SDK launcher.
   "window_height": 300,
   // Optional, holds the download URL of the mod template for the game (must point to a zip file)
   // For reference, this is the P2CE template mod download URL:
-  "mod_template_url": "https://github.com/StrataSource/p2ce-mod-template/archive/refs/heads/main.zip",
+  //"mod_template_url": "https://github.com/StrataSource/p2ce-mod-template/archive/refs/heads/main.zip",
+  // OR it can be a JSON object if there are multiple mod templates:
+  "mod_template_url": {
+    "Full Support (HL2/P1/P2)": "https://github.com/StrataSource/p2ce-mod-template/archive/refs/heads/main.zip",
+    "Lite Support (Portal 2)": "https://github.com/StrataSource/p2ce-mod-template/archive/refs/heads/feat/lite.zip"
+  },
   // Optional, the default is false (enables P2CE-style addons)
   "supports_p2ce_addons": false,
   // Sections hold titled groups of buttons

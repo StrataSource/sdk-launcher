@@ -129,9 +129,7 @@ Window::Window(QWidget* parent)
 	// Utilities menu
 	auto* utilitiesMenu = this->menuBar()->addMenu(tr("Utilities"));
 
-	this->utilities_createNewMod = utilitiesMenu->addAction(this->style()->standardIcon(QStyle::SP_FileIcon), tr("Create New Mod"), [this] {
-		NewModDialog::open(::getRootPath(this->configUsingLegacyBinDir), this->configModTemplateURL, this);
-	});
+	this->utilities_createNewMod = utilitiesMenu->addMenu(this->style()->standardIcon(QStyle::SP_FileIcon), tr("Create New Mod"));
 
 	this->utilities_createNewAddon = utilitiesMenu->addAction(this->style()->standardIcon(QStyle::SP_FileIcon), tr("Create New Addon"), [this] {
 		QString gameRoot;
@@ -225,7 +223,18 @@ void Window::loadGameConfig(const QString& path) {
 
 	this->configUsingLegacyBinDir = gameConfig->getUsesLegacyBinDir();
 	this->configModTemplateURL = gameConfig->getModTemplateURL();
-	this->utilities_createNewMod->setDisabled(this->configModTemplateURL.isEmpty());
+
+	this->utilities_createNewMod->clear();
+	if (this->configModTemplateURL.isEmpty()) {
+		this->utilities_createNewMod->setDisabled(true);
+	} else {
+		for (const auto& [desc, url] : this->configModTemplateURL.asKeyValueRange()) {
+			this->utilities_createNewMod->addAction(desc, [this, url] {
+				NewModDialog::open(::getRootPath(this->configUsingLegacyBinDir), url, this);
+			});
+		}
+	}
+
 	this->utilities_createNewAddon->setDisabled(!gameConfig->supportsP2CEAddons());
 
 	auto recentConfigs = Options::get<QStringList>(STR_RECENT_CONFIGS);

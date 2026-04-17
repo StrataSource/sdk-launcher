@@ -2,6 +2,7 @@
 
 #include <optional>
 #include <QList>
+#include <QMap>
 #include <QString>
 
 constexpr int DEFAULT_WINDOW_WIDTH = 256;
@@ -52,7 +53,7 @@ public:
 
 	[[nodiscard]] int getWindowHeight() const { return this->windowHeight; }
 
-	[[nodiscard]] const QString& getModTemplateURL() const { return this->modTemplateURL; }
+	[[nodiscard]] const QMap<QString, QString>& getModTemplateURL() const { return this->modTemplateURL; }
 
 	[[nodiscard]] bool supportsP2CEAddons() const { return this->p2ceAddonsSupported; }
 
@@ -66,7 +67,7 @@ private:
 	bool usesLegacyBinDir = false;
 	int windowWidth = DEFAULT_WINDOW_WIDTH;
 	int windowHeight = DEFAULT_WINDOW_HEIGHT;
-	QString modTemplateURL;
+	QMap<QString, QString> modTemplateURL;
 	bool p2ceAddonsSupported = false;
 	QList<Section> sections;
 

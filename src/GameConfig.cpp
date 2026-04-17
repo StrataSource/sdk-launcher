@@ -76,8 +76,16 @@ std::optional<GameConfig> GameConfig::parse(const QString& path) {
 		gameConfig.windowHeight = configObject["window_height"].toInt(DEFAULT_WINDOW_HEIGHT);
 	}
 
-	if (configObject.contains("mod_template_url") && configObject["mod_template_url"].isString()) {
-		gameConfig.modTemplateURL = configObject["mod_template_url"].toString();
+	if (configObject.contains("mod_template_url")) {
+		if (configObject["mod_template_url"].isString()) {
+			gameConfig.modTemplateURL["Mod Template"] = configObject["mod_template_url"].toString();
+		} else if (configObject["mod_template_url"].isObject()) {
+			for (const auto& modTemplateObject = configObject["mod_template_url"].toObject(); const auto& [desc, url] : modTemplateObject.asKeyValueRange()) {
+				if (url.isString()) {
+					gameConfig.modTemplateURL[desc.toString()] = url.toString();
+				}
+			}
+		}
 	}
 
 	if (configObject.contains("supports_p2ce_addons") && configObject["supports_p2ce_addons"].isBool()) {

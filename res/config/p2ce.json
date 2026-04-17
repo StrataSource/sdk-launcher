@@ -2,7 +2,10 @@
   "game_default": "p2ce",
   "window_width": 308,
   "window_height": 621,
-  "mod_template_url": "https://github.com/StrataSource/p2ce-mod-template/archive/refs/heads/main.zip",
+  "mod_template_url": {
+    "Full Support (HL2/P1/P2)": "https://github.com/StrataSource/p2ce-mod-template/archive/refs/heads/main.zip",
+    "Lite Support (Portal 2)": "https://github.com/StrataSource/p2ce-mod-template/archive/refs/heads/feat/lite.zip"
+  },
   "supports_p2ce_addons": true,
   "sections": [
     {

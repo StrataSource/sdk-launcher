@@ -28,7 +28,7 @@ private:
 	QString downloadURL;
 
 	QComboBox* parentFolder;
-	QLineEdit* parentFolderCustom;
+	QLineEdit* parentFolderCustomPath;
 	QLineEdit* modID;
 	QCheckBox* addShortcutOnDesktop;
 	QProgressBar* downloadProgress;

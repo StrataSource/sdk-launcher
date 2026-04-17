@@ -11,6 +11,7 @@
 #include <QDialogButtonBox>
 #include <QDir>
 #include <QFile>
+#include <QFileDialog>
 #include <QFormLayout>
 #include <QLabel>
 #include <QLineEdit>
@@ -19,6 +20,7 @@
 #include <QNetworkReply>
 #include <QProgressBar>
 #include <QProgressDialog>
+#include <QPushButton>
 #include <QStandardPaths>
 
 #include "Steam.h"
@@ -155,10 +157,25 @@ NewModDialog::NewModDialog(QString gameRoot_, QString downloadURL_, QWidget* par
 	this->parentFolder->addItem(tr("Custom Location"));
 	layout->addRow(tr("Install Location"), this->parentFolder);
 
-	auto* parentFolderCustomLabel = new QLabel{tr("Custom Location"), this};
-	this->parentFolderCustom = new QLineEdit{this};
-	this->parentFolderCustom->setPlaceholderText(tr("path/to/mod/parent/folder"));
-	layout->addRow(parentFolderCustomLabel, this->parentFolderCustom);
+	auto* parentFolderCustomParent = new QWidget{this};
+	auto* parentFolderCustomLayout = new QHBoxLayout{parentFolderCustomParent};
+	parentFolderCustomLayout->setSpacing(4);
+	parentFolderCustomLayout->setContentsMargins(0, 0, 0, 0);
+
+	this->parentFolderCustomPath = new QLineEdit{parentFolderCustomParent};
+	parentFolderCustomLayout->addWidget(this->parentFolderCustomPath);
+
+	auto* parentFolderCustomSearch = new QPushButton{parentFolderCustomParent};
+	parentFolderCustomSearch->setIcon(this->style()->standardIcon(QStyle::SP_DirOpenIcon));
+	parentFolderCustomLayout->addWidget(parentFolderCustomSearch);
+
+	QObject::connect(parentFolderCustomSearch, &QPushButton::clicked, this, [this] {
+		if (const auto path = QFileDialog::getExistingDirectory(this, tr("Select Parent Folder")); !path.isEmpty()) {
+			this->parentFolderCustomPath->setText(path);
+		}
+	});
+
+	layout->addRow(tr("Custom Location"), parentFolderCustomParent);
 
 	this->modID = new QLineEdit{this};
 	this->modID->setPlaceholderText(tr("For example: p2ce, revolution, portal2"));
@@ -179,12 +196,10 @@ NewModDialog::NewModDialog(QString gameRoot_, QString downloadURL_, QWidget* par
 	this->network = new QNetworkAccessManager{this};
 
 	// We want the custom input to be invisible unless the combo box is on the custom option
-	parentFolderCustomLabel->hide();
-	this->parentFolderCustom->hide();
-	QObject::connect(this->parentFolder, &QComboBox::currentIndexChanged, this, [this, knowsSourcemodsDirLocation, parentFolderCustomLabel](int index) {
+	layout->setRowVisible(parentFolderCustomParent, false);
+	QObject::connect(this->parentFolder, &QComboBox::currentIndexChanged, this, [knowsSourcemodsDirLocation, layout, parentFolderCustomParent](int index) {
 		const int customIndex = knowsSourcemodsDirLocation ? 2 : 1;
-		parentFolderCustomLabel->setVisible(index == customIndex);
-		this->parentFolderCustom->setVisible(index == customIndex);
+		layout->setRowVisible(parentFolderCustomParent, index == customIndex);
 	});
 
 	// Connect ok/cancel buttons to download stuff
@@ -277,7 +292,7 @@ QString NewModDialog::getModInstallDirParent() const {
 			return this->gameRoot;
 		default:
 		case 2:
-			return this->parentFolderCustom->text();
+			return this->parentFolderCustomPath->text();
 	}
 }
 

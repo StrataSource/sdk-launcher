@@ -83,12 +83,10 @@ std::optional<GameConfig> GameConfig::parse(const QString& path) {
 		if (configObject["mod_template_url"].isString()) {
 			gameConfig.modTemplateURL["Mod Template"] = configObject["mod_template_url"].toString();
 		} else if (configObject["mod_template_url"].isObject()) {
-			for (
-				const auto modTemplateObject = configObject["mod_template_url"].toObject();
-				const auto& [desc, url] : modTemplateObject.asKeyValueRange()
-			) {
-				if (url.isString()) {
-					gameConfig.modTemplateURL.insert(desc.toString(), url.toString());
+			const auto modTemplateObject = configObject["mod_template_url"].toObject();
+			for (auto modTemplatePair = modTemplateObject.begin(); modTemplatePair != modTemplateObject.end(); ++modTemplatePair) {
+				if (modTemplatePair.value().isString()) {
+					gameConfig.modTemplateURL.insert(modTemplatePair.key(), modTemplatePair.value().toString());
 				}
 			}
 		}

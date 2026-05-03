@@ -23,7 +23,8 @@ Here is an example config file that may be loaded into the SDK launcher.
 {
   // The name of the game directory (if relative), or an absolute path. If this field is an absolute path,
   // the game_icon field (which assumes ${GAME} is relative) should be updated to prevent a missing logo.
-  // Use ${SOURCEMODS} to enter the SourceMods folder, for example "${SOURCEMODS}/mymod"
+  // Use ${SOURCEMODS} to enter the SourceMods folder, e.g. "${SOURCEMODS}/mymod"
+  // Use ${CFGDIR} to enter the folder the config JSON is stored in, e.g. use "${CFGDIR}" for mymod/launch_config.json
   "game_default": "p2ce",
   // Optional, the default is "${ROOT}/${GAME}/resource/game.ico"
   "game_icon": "${ROOT}/${GAME}/resource/game.ico",

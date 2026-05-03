@@ -251,6 +251,13 @@ void Window::loadGameConfig(const QString& path) {
 	// Set ${SOURCEMODS}
 	gameConfig->setVariable("SOURCEMODS", ::getSourceModsDir());
 
+	// Set ${CFGDIR}
+	if (!path.startsWith(":/")) {
+		QDir cfgParent{path};
+		cfgParent.cdUp();
+		gameConfig->setVariable("CFGDIR", cfgParent.absolutePath());
+	}
+
 	// Set ${ROOT}
 	const auto rootPath = ::getRootPath(this->configUsingLegacyBinDir);
 	gameConfig->setVariable("ROOT", rootPath);

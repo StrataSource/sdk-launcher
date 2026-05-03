@@ -7,6 +7,13 @@
       "name": "Game",
       "entries": [
         {
+          "name": "Portal: Revolution - Default Mode",
+          "type": "command",
+          "action": "${ROOT}/bin/${PLATFORM}/revolution",
+          "arguments": ["-game", "${GAME}", "-console"],
+          "icon_override": "${GAME_ICON}"
+        },
+        {
           "name": "Portal: Revolution - Dev Mode",
           "type": "command",
           "action": "${ROOT}/bin/${PLATFORM}/revolution",

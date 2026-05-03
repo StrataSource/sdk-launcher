@@ -55,11 +55,18 @@ jobs:
         run: |
           cmake --build . --config ${{matrix.build_type}} -t SDKLauncher -- -j%NUMBER_OF_PROCESSORS%
 
-      - name: Upload SDK Launcher
+      - name: Upload SDK Launcher Executable
         uses: actions/upload-artifact@v7
         with:
           name: 'SDKLauncher-${{matrix.target}}-Windows-${{matrix.compiler}}-${{matrix.build_type}}'
           path: ${{env.BUILD_DIR}}/SDKLauncher.exe
+          retention-days: 7
+
+      - name: Upload SDK Launcher PDB
+        uses: actions/upload-artifact@v7
+        with:
+          name: 'SDKLauncher-${{matrix.target}}-Windows-PDBs-${{matrix.compiler}}-${{matrix.build_type}}'
+          path: ${{env.BUILD_DIR}}/SDKLauncher.pdb
           retention-days: 7
 
   build-linux:
